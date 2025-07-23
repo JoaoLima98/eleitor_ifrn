@@ -24,4 +24,4 @@ COPY . .
 EXPOSE 8000
 
 # Comando para executar a aplicação quando o contêiner for iniciado.
-CMD ["python", "eleitor.gr.servidor_grupo_eleitores.py", "--host", "0.0.0.0", "-port", "8000"]
+CMD ["python", "gr.servidor_grupo_eleitores.py", "--host", "0.0.0.0", "-port", "8000"]
