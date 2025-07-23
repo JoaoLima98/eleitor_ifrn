@@ -4,7 +4,7 @@ FROM python:3.13.0-slim
 
 # Define o diretório de trabalho dentro do contêiner.
 # Todos os comandos subsequentes serão executados neste diretório.
-WORKDIR /eleitor_ifrn
+WORKDIR /eleitor
 
 # Copia o arquivo de requisitos para o diretório de trabalho.
 # É uma boa prática copiar apenas este arquivo primeiro para aproveitar o cache do Docker.
@@ -24,4 +24,4 @@ COPY . .
 EXPOSE 8000
 
 # Comando para executar a aplicação quando o contêiner for iniciado.
-CMD ["python", "gr.servidor_grupo_eleitores.py", "--host", "0.0.0.0", "-port", "8000"]
+CMD ["python", "eleitor.gr.servidor_grupo_eleitores.py", "--host", "0.0.0.0", "-port", "8000"]
