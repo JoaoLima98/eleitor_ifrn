@@ -57,9 +57,9 @@ class ElegivelServiceImpl(elegivel_pb2_grpc.ElegivelServiceServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     elegivel_pb2_grpc.add_ElegivelServiceServicer_to_server(ElegivelServiceImpl(), server)
-    server.add_insecure_port('[::]:50052')
+    server.add_insecure_port('[::]:8000')
     server.start()
-    print("Servidor gRPC ouvindo na porta 50052...")
+    print("Servidor gRPC ouvindo na porta 8000...")
     server.wait_for_termination()
 
 if __name__ == '__main__':

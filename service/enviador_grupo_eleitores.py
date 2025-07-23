@@ -2,7 +2,7 @@ import grpc
 from gr import eleitor_pb2, eleitor_pb2_grpc
 
 def run():
-    with grpc.insecure_channel('localhost:50051') as channel:
+    with grpc.insecure_channel('18.118.122.201:8000') as channel:
         stub = eleitor_pb2_grpc.GrupoEleitorServiceStub(channel)
 
         curso1 = eleitor_pb2.Curso(

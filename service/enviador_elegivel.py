@@ -2,7 +2,7 @@ import grpc
 from gr import elegivel_pb2, elegivel_pb2_grpc
 
 def run():
-    with grpc.insecure_channel('localhost:50052') as channel:
+    with grpc.insecure_channel('18.118.122.201:8000') as channel:
         stub = elegivel_pb2_grpc.ElegivelServiceStub(channel)
 
         curso = elegivel_pb2.Curso(

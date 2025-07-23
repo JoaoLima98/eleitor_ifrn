@@ -70,9 +70,9 @@ def serve():
     eleitor_pb2_grpc.add_GrupoEleitorServiceServicer_to_server(
         GrupoEleitorServiceImpl(), server
     )
-    server.add_insecure_port('[::]:50051')
+    server.add_insecure_port('[::]:8000')
     server.start()
-    print("Servidor gRPC escutando na porta 50051...")
+    print("Servidor gRPC escutando na porta 8000...")
     server.wait_for_termination()
 
 if __name__ == '__main__':
