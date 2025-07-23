@@ -9,7 +9,7 @@ services:
     ports:
       - "8000:8000"           # Mapeia a porta do container para a máquina local
     volumes:
-      - .:/eleitor           # Sincroniza o código local com o diretório /app no container (opcional em produção)
+      - .:/eleitor_ifrn           # Sincroniza o código local com o diretório /app no container (opcional em produção)
     command: >
       python gr/servidor_grupo_eleitores.py --host 0.0.0.0 --port 8000
     environment:
