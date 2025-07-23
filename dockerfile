@@ -4,7 +4,7 @@ FROM python:3.13.0-slim
 
 # Define o diretório de trabalho dentro do contêiner.
 # Todos os comandos subsequentes serão executados neste diretório.
-WORKDIR /eleitor
+WORKDIR /eleitor_ifrn
 
 # Copia o arquivo de requisitos para o diretório de trabalho.
 # É uma boa prática copiar apenas este arquivo primeiro para aproveitar o cache do Docker.
