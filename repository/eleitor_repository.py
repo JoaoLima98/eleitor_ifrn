@@ -1,8 +1,8 @@
-from eleitor.domain.enum.status import Status
+from domain.enum.status import Status
 from datetime import date
-from eleitor.domain.eleitor import Eleitor  # ou onde estiver sua classe Eleitor
-from eleitor.domain.vinculo import Vinculo
-from eleitor.domain.curso import Curso
+from domain.eleitor import Eleitor  # ou onde estiver sua classe Eleitor
+from domain.vinculo import Vinculo
+from domain.curso import Curso
 class EleitorRepository:
     
     def get_lista_eleitores(self) -> list[Eleitor]:
