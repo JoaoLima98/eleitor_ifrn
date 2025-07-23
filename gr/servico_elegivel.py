@@ -1,10 +1,10 @@
 import grpc
 from concurrent import futures
 from grpc import elegivel_pb2, elegivel_pb2_grpc
-from domain.elegivel import Elegivel
-from domain.curso import Curso
-from domain.vinculo import Vinculo
-from domain.etapa import Etapa 
+from eleitor.domain.elegivel import Elegivel
+from eleitor.domain.curso import Curso
+from eleitor.domain.vinculo import Vinculo
+from eleitor.domain.etapa import Etapa 
 from datetime import datetime
 
 
