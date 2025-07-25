@@ -1,42 +1,45 @@
-'''import psycopg2
-
-
-class PessoaRepository:
-
-    def __init__(self):
-        self.conn = psycopg2.connect(dbname="eleicao", user="postgres", password="87654321", host="localhost", port="5432")
-
-
-    def get_cpf_pessoas(self):
-        with self.conn.cursor() as cur:
-            cur.execute("SELECT cpf FROM pessoas")
-            return [row[0] for row in cur.fetchall()]
-        
-    def get_email_pessoas(self):
-        with self.conn.cursor() as cur:
-            cur.execute("SELECT email FROM pessoas")
-            return [row[0] for row in cur.fetchall()]'''
-            
-            
-            
+from infra.models.pessoa_model import PessoaModel
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from domain.pessoa import Pessoa
 
 class PessoaRepository:
-    
-    def get_cpf_unico(self, cpf: str):
-        lista_de_cpf = [
-            "11568675411",
-            "12345678910"
-        ]
-        if cpf in lista_de_cpf:
-            return None
-        return cpf
-        
-    def get_email_unico(self, email: str):
-        lista_de_emails = [
-            "joaode@gmail.com",
-            "jesus@gmail.com"
-        ]
-        if email in lista_de_emails:
-            return None
-        return email
-        
+    def __init__(self, db: Session):
+        self.db = db
+
+    def salvar(self, pessoa: Pessoa):
+        model = PessoaModel(
+            id=pessoa.id,
+            nome=pessoa.nome,
+            cpf=pessoa.cpf,
+            email=pessoa.email,
+            data_nascimento=pessoa.data_nascimento
+        )
+        try:
+            self.db.add(model)
+            self.db.commit()
+            self.db.refresh(model)
+        except Exception as e:
+            self.db.rollback()
+            raise e
+        return pessoa
+
+    def buscar_por_id(self, pessoa_id: int) -> Pessoa | None:
+        try:
+            model = self.db.execute(
+                select(PessoaModel).where(PessoaModel.id == pessoa_id)
+            ).scalar_one_or_none()
+
+            if model is None:
+                return None
+
+            return Pessoa(
+                id=model.id,
+                nome=model.nome,
+                cpf=model.cpf,
+                email=model.email,
+                data_nascimento=model.data_nascimento,
+                vinculos=[]  # pode ser carregado separadamente
+            )
+        except Exception as e:
+            raise e

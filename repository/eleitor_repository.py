@@ -1,20 +1,53 @@
-from eleitor.domain.enum.status import Status
-from datetime import date
-from eleitor.domain.eleitor import Eleitor  # ou onde estiver sua classe Eleitor
-from eleitor.domain.vinculo import Vinculo
-from eleitor.domain.curso import Curso
-class EleitorRepository:
-    
-    def get_lista_eleitores(self) -> list[Eleitor]:
-        # Suponha que esse seja o retorno do banco
-        self.curso = Curso(1, "Filosofia", "Curso de licenciatura em Filosofia")
-        vinculo1 = Vinculo(id=1, matricula="1234560", tipo=1, id_pessoa=123,curso=self.curso)
-        vinculo2 = Vinculo(id=2, matricula="1234568", tipo=1, id_pessoa=124,curso=self.curso)
-        vinculo3 = Vinculo(id=3, matricula="1234569", tipo=1, id_pessoa=125,curso=self.curso)
-        eleitores_do_banco = [
-            Eleitor(123, "Ana", "ana@example.com", "24686548039", date(1990, 1, 1), 1, vinculos=[vinculo1]),  # ATIVO
-            Eleitor(124, "Bruno", "bruno@example.com", "24686548039", date(1985, 5, 5), 2, vinculos=[vinculo2]),  # INATIVO
-            Eleitor(125, "Clara", "clara@example.com", "24686548039", date(1992, 8, 10), 1, vinculos=[vinculo3]),  # ATIVO
-        ]
+from infra.models.eleitor_model import EleitorModel, StatusEnum
+from infra.models.pessoa_model import PessoaModel
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from domain.eleitor import Eleitor
+from domain.enum.status import Status
 
-        return [eleitor for eleitor in eleitores_do_banco if eleitor.status == Status.ATIVO]
+class EleitorRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def salvar(self, eleitor: Eleitor):
+        try:
+            pessoa_model = self.db.get(PessoaModel, eleitor.id)
+            if not pessoa_model:
+                raise ValueError("Pessoa associada ao eleitor não encontrada no banco.")
+
+            model = EleitorModel(
+                id=eleitor.id,
+                status=eleitor.status.name
+            )
+            self.db.add(model)
+            self.db.commit()
+            self.db.refresh(model)
+            return eleitor
+        except Exception as e:
+            self.db.rollback()
+            raise e
+
+    def buscar_por_id(self, eleitor_id: int) -> Eleitor | None:
+        try:
+            model = self.db.execute(
+                select(EleitorModel).where(EleitorModel.id == eleitor_id)
+            ).scalar_one_or_none()
+
+            if model is None:
+                return None
+
+            pessoa_model = self.db.get(PessoaModel, model.id)
+            if pessoa_model is None:
+                return None
+
+            return Eleitor(
+                id=pessoa_model.id,
+                nome=pessoa_model.nome,
+                cpf=pessoa_model.cpf,
+                email=pessoa_model.email,
+                data_nascimento=pessoa_model.data_nascimento,
+                status=Status(model.status),
+                vinculos=[]  # carregar vínculos se necessário
+            )
+        except Exception as e:
+            raise e
