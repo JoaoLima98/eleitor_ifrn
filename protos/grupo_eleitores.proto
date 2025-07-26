@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package grupo;
+
+service GrupoEleitoresService {
+  rpc EnviarGrupo (GrupoRequest) returns (GrupoEleitoresMessage);
+}
+
+message GrupoRequest {
+  int32 id = 1;
+}
+
+message EleitorMessage {
+  int32 id = 1;
+  string nome = 2;
+  string email = 3;
+  string cpf = 4;
+  string data_nascimento = 5;
+  string status = 6;
+}
+
+message GrupoEleitoresMessage {
+  int32 id = 1;
+  string nome = 2;
+  string descricao = 3;
+  bool ativo = 4;
+  repeated EleitorMessage lista_eleitores = 5;
+  string data_cadastro = 6;
+  string data_atualizacao = 7;
+}
