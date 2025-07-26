@@ -1,7 +1,10 @@
-from infra.models.vinculo_model import VinculoModel
+from models.vinculo_model import VinculoModel
+from models.curso_model import CursoModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from domain.vinculo import Vinculo
+from domain.curso import Curso
+from domain.enum.tipo_vinculo import TipoVinculo
 
 class VinculoRepository:
     def __init__(self, db: Session):
@@ -10,8 +13,10 @@ class VinculoRepository:
     def salvar(self, vinculo: Vinculo):
         model = VinculoModel(
             id=vinculo.id,
-            tipo=vinculo.tipo,
-            pessoa_id=vinculo.pessoa_id
+            tipo=vinculo.tipo.name,
+            matricula=vinculo.matricula,
+            pessoa_id=vinculo.id_pessoa,
+            curso_id=vinculo.curso.id
         )
         try:
             self.db.add(model)
@@ -31,10 +36,49 @@ class VinculoRepository:
             if model is None:
                 return None
 
+            curso_model = self.db.get(CursoModel, model.curso_id)
+
+            curso = Curso(
+                id=curso_model.id,
+                nome=curso_model.nome,
+                descricao=curso_model.descricao,
+                etapa=None  # você pode carregar etapa se quiser aqui
+            )
+
             return Vinculo(
                 id=model.id,
-                tipo=model.tipo,
-                pessoa_id=model.pessoa_id
+                matricula=model.matricula,
+                tipo=TipoVinculo[model.tipo],
+                id_pessoa=model.pessoa_id,
+                curso=curso
+            )
+        except Exception as e:
+            raise e
+
+    def buscar_por_matricula(self, matricula: str) -> Vinculo | None:
+        try:
+            model = self.db.execute(
+                select(VinculoModel).where(VinculoModel.matricula == matricula)
+            ).scalar_one_or_none()
+
+            if model is None:
+                return None
+
+            curso_model = self.db.get(CursoModel, model.curso_id)
+
+            curso = Curso(
+                id=curso_model.id,
+                nome=curso_model.nome,
+                descricao=curso_model.descricao,
+                etapa=None
+            )
+
+            return Vinculo(
+                id=model.id,
+                matricula=model.matricula,
+                tipo=TipoVinculo[model.tipo],
+                id_pessoa=model.pessoa_id,
+                curso=curso
             )
         except Exception as e:
             raise e

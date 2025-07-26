@@ -1,16 +1,14 @@
 from domain.enum.tipo_vinculo import TipoVinculo
 from domain.curso import Curso
-from service.vinculo_service import VinculoService
 
 
 
 class Vinculo:
-    def __init__(self, id: int, matricula: str, tipo: int, id_pessoa: int, curso: Curso, service = VinculoService()):
+    def __init__(self, id: int, matricula: str, tipo: int, id_pessoa: int, curso: Curso):
         self.id = id
         self.matricula = matricula
         self.tipo = TipoVinculo(tipo)
         self.id_pessoa = id_pessoa
-        self.service = service
         self.curso = curso
         
         self.verifica_matricula_unica()
@@ -26,12 +24,7 @@ class Vinculo:
         if not self.matricula.isdigit():
             raise ValueError("Matrícula inválida. Deve conter apenas números.")
         return self.matricula
-    
-    def verifica_matricula_unica(self):
-        if not self.service.get_matricula_by_matricula(self.matricula):
-            raise ValueError("Matrícula já cadastrada.")
-        return self.matricula
-    
+
     def verifica_se_matricula_nao_e_falsy(self):
         if not bool(self.matricula):
             raise ValueError("Matricula inválido.")

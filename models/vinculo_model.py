@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from infra.base import Base
 import datetime
 
-class VinculoModel(Base):
+class vinculo_model(Base):
     __tablename__ = "vinculos"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -14,3 +14,4 @@ class VinculoModel(Base):
     data_atualizacao = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     pessoa = relationship("PessoaModel", back_populates="vinculos")
+    curso = relationship("CursoModel", back_populates="vinculos")

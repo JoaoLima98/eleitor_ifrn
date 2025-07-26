@@ -1,12 +1,10 @@
 from datetime import date, datetime
 from domain.vinculo import Vinculo
-from service.pessoa_service import PessoaService
 import re
 
 class Pessoa:
 
-    def __init__(self, id: int, cpf: str, email: str, data_nascimento: date, nome: str, vinculos = list[Vinculo], 
-                 service = PessoaService()):
+    def __init__(self, id: int, cpf: str, email: str, data_nascimento: date, nome: str, vinculos = list[Vinculo]):
         self.id = id
         self.cpf = cpf
         self.email = email
@@ -15,8 +13,7 @@ class Pessoa:
         self.vinculos = vinculos or []
         self.data_criacao = datetime.now()
         self.data_atualizacao = datetime.now()
-        self.service = service
-        
+
         self.validar_vinculos()
         self.verifica_email_unico()
         self.verifica_cpf_unico()
@@ -35,23 +32,6 @@ class Pessoa:
         if not bool(self.data_nascimento):
             raise ValueError("Data de nascimento inválido.")
         return True
-    
-    def verifica_cpf_unico(self):
-        if not self.service.get_cpf_by_cpf(self.cpf):
-            raise ValueError("CPF já cadastrado.")
-        return self.cpf
-    
-    def verifica_email_unico(self):
-        if not self.service.get_email_by_email(self.email):
-            raise ValueError("Email já cadastrado.")
-        return self.email
-
-    def valida_cpf(self):
-        if not self.cpf:
-          return False
-        if not self.verifica_cpf_unico():
-            return False
-        return self.service.validar_cpf(self.cpf)
 
 
     def validar_email(self):

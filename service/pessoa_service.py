@@ -1,22 +1,39 @@
 from repository.pessoa_repository import PessoaRepository
+from domain.pessoa import Pessoa
 import re
 
-pessoa_repository = PessoaRepository()
+repository = PessoaRepository()
 
 class PessoaService:
-    
-    def get_cpf_by_cpf(self, cpf: str):
-        if not cpf:
-          return False
-        return pessoa_repository.get_cpf_unico(cpf)
+  
+    def __init__(self, repository: PessoaRepository):
+        self.repository = repository
+  
+    def salvar(self, pessoa: Pessoa) -> Pessoa:
+        if not self.validar_cpf(pessoa.cpf):
+            raise ValueError("CPF inválido.")
+        
+        existente_cpf = self.repository.buscar_por_cpf(pessoa.cpf)
+        if existente_cpf and existente_cpf.id != pessoa.id:
+            raise ValueError("CPF já cadastrado.")
 
-    def get_email_by_email(self, email: str):
+        existente_email = self.repository.buscar_por_email(pessoa.email)
+        if existente_email and existente_email.id != pessoa.id:
+            raise ValueError("Email já cadastrado.")
+
+        return self.repository.salvar(pessoa)
+      
+    def buscar_por_cpf(self, cpf: str) -> Pessoa | None:
+        if not self.validar_cpf(cpf):
+            raise ValueError("CPF inválido.")
+        return self.repository.buscar_por_cpf(cpf)
+    
+    def buscar_por_email(self, email: str) -> Pessoa | None:
         if not email:
-           return False
-        return pessoa_repository.get_email_unico(email)
-    
-    
-    
+            raise ValueError("Email inválido.")
+        return self.repository.buscar_por_email(email)
+      
+
     def validar_cpf(self, cpf: str):
       return self.__validar_cpf(cpf)
     

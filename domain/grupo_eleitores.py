@@ -2,11 +2,10 @@ from typing import List
 from unittest.mock import patch
 from domain.eleitor import Eleitor
 from datetime import datetime
-from service.grupo_eleitores_service import GrupoEleitoresService
 
 class GrupoEleitores:
     
-    def __init__(self, id: int,  nome: str, descricao: str, ativo: bool = True, service: GrupoEleitoresService = GrupoEleitoresService()):
+    def __init__(self, id: int,  nome: str, descricao: str, ativo: bool = True):
         self.id = id
         self.nome = nome
         self.descricao = descricao
@@ -14,7 +13,6 @@ class GrupoEleitores:
         self.lista_eleitores: List[Eleitor] = []
         self.data_cadastro = datetime.now()
         self.data_atualizacao = datetime.now()
-        self.service = service
         self.verifica_se_nome_nao_e_falsy()
         self.verifica_nome_unico()
     
@@ -25,10 +23,6 @@ class GrupoEleitores:
             raise ValueError("Nome inválido.")
         return True
     
-    def verifica_nome_unico(self):
-        if not self.service.get_nome_by_nome(self.nome):
-            raise ValueError("Nome já cadastrado.")
-        return self.nome
     
     def set_lista_eleitores(self, lista: List[Eleitor]):
         self.lista_eleitores = lista

@@ -19,4 +19,4 @@ class EleitorModel(Base):
     data_criacao = Column(DateTime, default=datetime.datetime.utcnow)
     data_atualizacao = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
-    pessoa = relationship("pessoa_model")
+    pessoa = relationship("PessoaModel")

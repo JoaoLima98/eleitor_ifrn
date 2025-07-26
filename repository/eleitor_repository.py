@@ -1,5 +1,5 @@
-from infra.models.eleitor_model import EleitorModel, StatusEnum
-from infra.models.pessoa_model import PessoaModel
+from models import eleitor_model
+from models import pessoa_model
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from domain.eleitor import Eleitor
@@ -11,11 +11,11 @@ class EleitorRepository:
 
     def salvar(self, eleitor: Eleitor):
         try:
-            pessoa_model = self.db.get(PessoaModel, eleitor.id)
+            pessoa_model = self.db.get(pessoa_model, eleitor.id)
             if not pessoa_model:
                 raise ValueError("Pessoa associada ao eleitor não encontrada no banco.")
 
-            model = EleitorModel(
+            model = eleitor_model(
                 id=eleitor.id,
                 status=eleitor.status.name
             )
@@ -27,16 +27,16 @@ class EleitorRepository:
             self.db.rollback()
             raise e
 
-    def buscar_por_id(self, eleitor_id: int) -> Eleitor | None:
+    def buscar_por_cpf(self, cpf: int) -> Eleitor | None:
         try:
             model = self.db.execute(
-                select(EleitorModel).where(EleitorModel.id == eleitor_id)
+                select(eleitor_model).where(eleitor_model.cpf == cpf)
             ).scalar_one_or_none()
 
             if model is None:
                 return None
 
-            pessoa_model = self.db.get(PessoaModel, model.id)
+            pessoa_model = self.db.get(pessoa_model, model.id)
             if pessoa_model is None:
                 return None
 

@@ -15,4 +15,4 @@ class PessoaModel(Base):
     data_criacao = Column(DateTime, default=datetime.datetime.utcnow)
     data_atualizacao = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
-    vinculos = relationship("vinculo_model", back_populates="pessoa", cascade="all, delete-orphan")
+    vinculos = relationship("VinculoModel", back_populates="pessoa", cascade="all, delete-orphan")
