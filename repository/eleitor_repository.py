@@ -2,14 +2,14 @@ from models import eleitor_model
 from models import pessoa_model
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from domain.eleitor import Eleitor
 from domain.enum.status import Status
+from infra.db import get_session
 
 class EleitorRepository:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session = get_session()):
         self.db = db
 
-    def salvar(self, eleitor: Eleitor):
+    def salvar(self, eleitor):
         try:
             pessoa_model = self.db.get(pessoa_model, eleitor.id)
             if not pessoa_model:
@@ -27,7 +27,7 @@ class EleitorRepository:
             self.db.rollback()
             raise e
 
-    def buscar_por_cpf(self, cpf: int) -> Eleitor | None:
+    def buscar_por_cpf(self, cpf: int):
         try:
             model = self.db.execute(
                 select(eleitor_model).where(eleitor_model.cpf == cpf)
@@ -40,14 +40,16 @@ class EleitorRepository:
             if pessoa_model is None:
                 return None
 
-            return Eleitor(
-                id=pessoa_model.id,
-                nome=pessoa_model.nome,
-                cpf=pessoa_model.cpf,
-                email=pessoa_model.email,
-                data_nascimento=pessoa_model.data_nascimento,
-                status=Status(model.status),
-                vinculos=[]  # carregar vínculos se necessário
+            return (
+                pessoa_model.id,
+                pessoa_model.nome,
+                pessoa_model.cpf,
+                pessoa_model.email,
+                pessoa_model.data_nascimento,
+                Status(model.status),
+                pessoa_model.vinculos
             )
+                
+            
         except Exception as e:
             raise e

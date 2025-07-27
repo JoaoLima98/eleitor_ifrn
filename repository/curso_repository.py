@@ -1,13 +1,13 @@
 from models.curso_model import CursoModel
 from sqlalchemy.orm import Session
-from domain.curso import Curso
 from domain.etapa import Etapa
+from infra.db import get_session
 
 class CursoRepository:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session = get_session()):
         self.db = db
 
-    def salvar(self, curso: Curso):
+    def salvar(self, curso):
         try:
             model = CursoModel(
                 id=curso.id,
@@ -25,18 +25,18 @@ class CursoRepository:
 
     def get_nome_by_nome(self, nome: str) -> bool:
         return self.db.query(CursoModel).filter(CursoModel.nome == nome).first() is None
-    def buscar_por_id(self, curso_id: int) -> Curso | None:
+    def buscar_por_id(self, curso_id: int):
         try:
             model = self.db.query(CursoModel).filter(CursoModel.id == curso_id).first()
             if model is None:
                 return None
 
             etapa = Etapa(id=model.etapa_id) if model.etapa_id else None
-            return Curso(
-                id=model.id,
-                nome=model.nome,
-                descricao=model.descricao,
-                etapa=etapa
+            return (
+                model.id,
+                model.nome,
+                model.descricao,
+                etapa
             )
         except Exception as e:
             raise e

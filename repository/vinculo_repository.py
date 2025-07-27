@@ -2,15 +2,15 @@ from models.vinculo_model import VinculoModel
 from models.curso_model import CursoModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from domain.vinculo import Vinculo
 from domain.curso import Curso
 from domain.enum.tipo_vinculo import TipoVinculo
+from infra.db import get_session
 
 class VinculoRepository:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session = get_session()):
         self.db = db
 
-    def salvar(self, vinculo: Vinculo):
+    def salvar(self, vinculo):
         model = VinculoModel(
             id=vinculo.id,
             tipo=vinculo.tipo.name,
@@ -27,7 +27,7 @@ class VinculoRepository:
             self.db.rollback()
             raise e
 
-    def buscar_por_id(self, vinculo_id: int) -> Vinculo | None:
+    def buscar_por_id(self, vinculo_id: int):
         try:
             model = self.db.execute(
                 select(VinculoModel).where(VinculoModel.id == vinculo_id)
@@ -45,17 +45,17 @@ class VinculoRepository:
                 etapa=None  # você pode carregar etapa se quiser aqui
             )
 
-            return Vinculo(
-                id=model.id,
-                matricula=model.matricula,
-                tipo=TipoVinculo[model.tipo],
-                id_pessoa=model.pessoa_id,
-                curso=curso
+            return (
+                model.id,
+                model.matricula,
+                TipoVinculo[model.tipo],
+                model.pessoa_id,
+                curso
             )
         except Exception as e:
             raise e
 
-    def buscar_por_matricula(self, matricula: str) -> Vinculo | None:
+    def buscar_por_matricula(self, matricula: str):
         try:
             model = self.db.execute(
                 select(VinculoModel).where(VinculoModel.matricula == matricula)
@@ -73,12 +73,12 @@ class VinculoRepository:
                 etapa=None
             )
 
-            return Vinculo(
-                id=model.id,
-                matricula=model.matricula,
-                tipo=TipoVinculo[model.tipo],
-                id_pessoa=model.pessoa_id,
-                curso=curso
+            return (
+                model.id,
+                model.matricula,
+                TipoVinculo[model.tipo],
+                model.pessoa_id,
+                curso
             )
         except Exception as e:
             raise e

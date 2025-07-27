@@ -1,17 +1,13 @@
 from repository.eleitor_repository import EleitorRepository
-from domain.eleitor import Eleitor
 from domain.enum.status import Status
 from repository.pessoa_repository import PessoaRepository
-
-eleitor_repository = EleitorRepository()
-        
-    
+ 
 class EleitorService:
-    def __init__(self, eleitor_repository: EleitorRepository, pessoa_repository: PessoaRepository):
-        self.eleitor_repository = eleitor_repository
-        self.pessoa_repository = pessoa_repository
+    def __init__(self):
+        self.eleitor_repository = EleitorRepository()
+        self.pessoa_repository = PessoaRepository()
 
-    def salvar(self, eleitor: Eleitor) -> Eleitor:
+    def salvar(self, eleitor):
         # Verifica se a pessoa existe, pelo id ou pelo cpf
         pessoa = self.pessoa_repository.buscar_por_cpf(eleitor.cpf)
         if not pessoa:

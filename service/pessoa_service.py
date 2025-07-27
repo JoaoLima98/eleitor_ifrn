@@ -1,15 +1,12 @@
 from repository.pessoa_repository import PessoaRepository
-from domain.pessoa import Pessoa
 import re
-
-repository = PessoaRepository()
 
 class PessoaService:
   
-    def __init__(self, repository: PessoaRepository):
-        self.repository = repository
+    def __init__(self):
+        self.repository = PessoaRepository()
   
-    def salvar(self, pessoa: Pessoa) -> Pessoa:
+    def salvar(self, pessoa):
         if not self.validar_cpf(pessoa.cpf):
             raise ValueError("CPF inválido.")
         
@@ -23,12 +20,12 @@ class PessoaService:
 
         return self.repository.salvar(pessoa)
       
-    def buscar_por_cpf(self, cpf: str) -> Pessoa | None:
+    def buscar_por_cpf(self, cpf: str):
         if not self.validar_cpf(cpf):
             raise ValueError("CPF inválido.")
         return self.repository.buscar_por_cpf(cpf)
     
-    def buscar_por_email(self, email: str) -> Pessoa | None:
+    def buscar_por_email(self, email: str):
         if not email:
             raise ValueError("Email inválido.")
         return self.repository.buscar_por_email(email)

@@ -1,20 +1,14 @@
-from domain.vinculo import Vinculo
 from repository.vinculo_repository import VinculoRepository
 from repository.pessoa_repository import PessoaRepository
 from repository.curso_repository import CursoRepository
 
 class VinculoService:
-    def __init__(
-        self,
-        vinculo_repository: VinculoRepository,
-        pessoa_repository: PessoaRepository,
-        curso_repository: CursoRepository
-    ):
-        self.vinculo_repository = vinculo_repository
-        self.pessoa_repository = pessoa_repository
-        self.curso_repository = curso_repository
+    def __init__(self):
+        self.vinculo_repository = VinculoRepository()
+        self.pessoa_repository = PessoaRepository()
+        self.curso_repository = CursoRepository()
 
-    def salvar(self, vinculo: Vinculo) -> Vinculo:
+    def salvar(self, vinculo):
         # Matrícula já existe?
         if self.vinculo_repository.buscar_por_matricula(vinculo.matricula):
             raise ValueError("Matrícula já cadastrada.")
@@ -31,5 +25,5 @@ class VinculoService:
 
         return self.vinculo_repository.salvar(vinculo)
 
-    def buscar_por_id(self, vinculo_id: int) -> Vinculo | None:
+    def buscar_por_id(self, vinculo_id: int):
         return self.vinculo_repository.buscar_por_id(vinculo_id)

@@ -1,12 +1,12 @@
 from models.etapa_model import EtapaModel
 from sqlalchemy.orm import Session
-from domain.etapa import Etapa
+from infra.db import get_session
 
 class EtapaRepository:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session = get_session()):
         self.db = db
 
-    def salvar(self, etapa: Etapa):
+    def salvar(self, etapa):
         try:
             model = EtapaModel(
                 etapa=etapa.etapa,
@@ -26,7 +26,7 @@ class EtapaRepository:
             EtapaModel.turno == turno
         ).first() is not None
         
-    def buscar_por_id(self, etapa: int, turno: str) -> Etapa | None:
+    def buscar_por_id(self, etapa: int, turno: str):
         try:
             model = self.db.query(EtapaModel).filter(
                 EtapaModel.etapa == etapa,
@@ -36,9 +36,9 @@ class EtapaRepository:
             if model is None:
                 return None
 
-            return Etapa(
-                etapa=model.etapa,
-                turno=model.turno
+            return (
+                model.etapa,
+                model.turno
             )
         except Exception as e:
             raise e
