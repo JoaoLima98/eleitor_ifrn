@@ -4,28 +4,23 @@ import re
 
 class Pessoa:
 
-    def __init__(self, id: int, cpf: str, email: str, data_nascimento: date, nome: str, vinculos = list[Vinculo]):
+    def __init__(self, id: int, cpf: str, email: str, data_nascimento: date, nome: str, vinculos = list[Vinculo] or None):
         self.id = id
         self.cpf = cpf
         self.email = email
         self.data_nascimento = data_nascimento
         self.nome = nome
-        self.vinculos = vinculos or []
+        self.vinculos = vinculos
         self.data_criacao = datetime.now()
         self.data_atualizacao = datetime.now()
 
         self.validar_vinculos()
-        self.verifica_email_unico()
-        self.verifica_cpf_unico()
         self.verifica_data_nascimento_nao_e_falsy()
         self.verifica_data_nascimento_valida()
         self.verifica_se_cpf_nao_e_falsy()
         self.verifica_se_nome_nao_e_falsy()
         self.verifica_se_email_nao_e_falsy()
         self.validar_email()
-        if not self.valida_cpf():
-            raise ValueError(f"CPF inválido: {self.cpf}")
-        self.verifica_se_vinculo_nao_e_falsy()
         
         
     def verifica_data_nascimento_nao_e_falsy(self):
@@ -67,8 +62,6 @@ class Pessoa:
         return True
     
     def validar_vinculos(self):
-        if not self.vinculos or len(self.vinculos) == 0:
-            raise ValueError("Pessoa deve ter pelo menos um vínculo.")
         for vinculo in self.vinculos:
             if vinculo.id_pessoa != self.id:
                 raise ValueError(f"Vínculo {vinculo} não corresponde ao ID da pessoa.")
@@ -76,7 +69,3 @@ class Pessoa:
     def get_pessoa_id(self):
         return self.id
     
-    def verifica_se_vinculo_nao_e_falsy(self):
-        if not self.vinculos:
-            raise ValueError("Pessoa não possui vínculos.")
-        return True

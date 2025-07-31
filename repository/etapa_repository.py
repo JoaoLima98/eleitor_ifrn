@@ -1,44 +1,55 @@
-from models.etapa_model import EtapaModel
-from sqlalchemy.orm import Session
-from infra.db import get_session
+from models import models
+from domain.etapa import Etapa
+from infra.db import SessionLocal
+from sqlalchemy import select
 
 class EtapaRepository:
-    def __init__(self, db: Session = get_session()):
-        self.db = db
-
     def salvar(self, etapa):
         try:
-            model = EtapaModel(
-                etapa=etapa.etapa,
-                turno=etapa.turno
-            )
-            self.db.add(model)
-            self.db.commit()
-            self.db.refresh(model)
-            return etapa
+            with SessionLocal() as session:
+                existente = session.execute(
+                    select(models.EtapaModel).where(
+                        models.EtapaModel.etapa == etapa.etapa,
+                        models.EtapaModel.turno == etapa.turno
+                    )
+                ).scalar_one_or_none()
+
+                if existente:
+                    return existente
+
+                model = models.EtapaModel(
+                    etapa=etapa.etapa,
+                    turno=etapa.turno
+                )
+                session.add(model)
+                session.commit()
+                session.refresh(model)
+                return model
         except Exception as e:
-            self.db.rollback()
+            session.rollback()
+            raise ValueError("Etapa duplicada no banco.")
+        except Exception as e:
             raise e
 
     def get_etapa_and_turno_by_etapa_and_turno(self, etapa: int, turno: str) -> bool:
-        return self.db.query(EtapaModel).filter(
-            EtapaModel.etapa == etapa,
-            EtapaModel.turno == turno
-        ).first() is not None
-        
-    def buscar_por_id(self, etapa: int, turno: str):
         try:
-            model = self.db.query(EtapaModel).filter(
-                EtapaModel.etapa == etapa,
-                EtapaModel.turno == turno
-            ).first()
+            with SessionLocal() as session:
+                result = session.execute(
+                    select(models.EtapaModel).where(
+                        models.EtapaModel.etapa == etapa,
+                        models.EtapaModel.turno == turno
+                    )
+                ).first()
+                return result is not None
+        except Exception as e:
+            raise e
 
-            if model is None:
-                return None
-
-            return (
-                model.etapa,
-                model.turno
-            )
+    def buscar_por_id(self, id: int):
+        try:
+            with SessionLocal() as session:
+                model = session.get(models.EtapaModel, id)
+                if model is None:
+                    return None
+                return (model.id, model.etapa, model.turno)
         except Exception as e:
             raise e

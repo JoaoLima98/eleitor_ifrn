@@ -1,42 +1,66 @@
-from models.curso_model import CursoModel
-from sqlalchemy.orm import Session
-from domain.etapa import Etapa
-from infra.db import get_session
+from models import models
+from domain.curso import Curso
+from infra.db import SessionLocal
+from sqlalchemy import select
 
 class CursoRepository:
-    def __init__(self, db: Session = get_session()):
-        self.db = db
-
-    def salvar(self, curso):
+    def salvar(self, curso: Curso):
         try:
-            model = CursoModel(
-                id=curso.id,
-                nome=curso.nome,
-                descricao=curso.descricao,
-                etapa_id=curso.etapa.id if curso.etapa else None
-            )
-            self.db.add(model)
-            self.db.commit()
-            self.db.refresh(model)
-            return curso
+            with SessionLocal() as session:
+                # Verifica se já existe pelo id (update) ou cria novo
+                if curso.id:
+                    model = session.get(models.CursoModel, curso.id)
+                    if not model:
+                        model = models.CursoModel()
+                else:
+                    model = models.CursoModel()
+
+                # Atualiza campos
+                model.nome = curso.nome
+                model.descricao = curso.descricao
+                model.etapa_id = curso.etapa.id if curso.etapa else None
+
+                session.add(model)
+                session.commit()
+                session.refresh(model)
+
+                # Atualiza o id do domain para refletir o id do banco (se novo)
+                curso.id = model.id
+
+                return curso
         except Exception as e:
-            self.db.rollback()
             raise e
 
-    def get_nome_by_nome(self, nome: str) -> bool:
-        return self.db.query(CursoModel).filter(CursoModel.nome == nome).first() is None
     def buscar_por_id(self, curso_id: int):
         try:
-            model = self.db.query(CursoModel).filter(CursoModel.id == curso_id).first()
-            if model is None:
-                return None
+            with SessionLocal() as session:
+                model = session.get(models.CursoModel, curso_id)
+                if model is None:
+                    return None
+                
+                # Converte para domain Curso
+                from domain.etapa import Etapa
+                etapa_domain = Etapa(
+                    id=model.etapa.id,
+                    etapa=model.etapa.etapa,
+                    turno=model.etapa.turno
+                ) if model.etapa else None
 
-            etapa = Etapa(id=model.etapa_id) if model.etapa_id else None
-            return (
-                model.id,
-                model.nome,
-                model.descricao,
-                etapa
-            )
+                curso = Curso(
+                    id=model.id,
+                    nome=model.nome,
+                    descricao=model.descricao,
+                    etapa=etapa_domain
+                )
+                return curso
+        except Exception as e:
+            raise e
+    def get_nome_by_nome(self, nome: str) -> bool:
+        try:
+            with SessionLocal() as session:
+                result = session.execute(
+                    select(models.CursoModel).where(models.CursoModel.nome == nome)
+                ).scalar_one_or_none()
+                return result is not None
         except Exception as e:
             raise e

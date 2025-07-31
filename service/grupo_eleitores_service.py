@@ -2,8 +2,8 @@ from domain.grupo_eleitores import GrupoEleitores
 from repository.grupo_eleitores_repository import GrupoEleitoresRepository
 
 class GrupoEleitoresService:
-    def __init__(self, grupo_repository: GrupoEleitoresRepository):
-        self.grupo_repository = grupo_repository
+    def __init__(self):
+        self.grupo_repository = GrupoEleitoresRepository()
 
     def salvar(self, grupo: GrupoEleitores) -> GrupoEleitores:
         if self.grupo_repository.nome_existe(grupo.nome):
@@ -22,7 +22,9 @@ class GrupoEleitoresService:
             raise ValueError("Grupo não encontrado.")
         
         grupo.append_lista_eleitores(eleitor)
-        return self.grupo_repository.salvar(grupo)
+        return self.grupo_repository.adicionar_eleitor(grupo_id, eleitor)
+
+    
     def remover_eleitor(self, grupo_id: int, eleitor) -> GrupoEleitores:
         grupo = self.grupo_repository.buscar_por_id(grupo_id)
         if not grupo:

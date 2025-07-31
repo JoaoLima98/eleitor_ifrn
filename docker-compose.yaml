@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   app:
     build:
@@ -10,8 +8,19 @@ services:
       - "8000:8000"           # Mapeia a porta do container para a máquina local
     volumes:
       - .:/eleitor          # Sincroniza o código local com o diretório /app no container (opcional em produção)
+    depends_on:
+      - postgres
     command: >
       python gr/servidor_grupo_eleitores.py --host 0.0.0.0 --port 8000
     environment:
       - PYTHONUNBUFFERED=1    # Evita buffering do stdout
       - PYTHONPATH=/eleitor   # Garante que o Python encontre o módulo 'domain'
+  postgres:
+    image: postgres:latest
+    container_name: db_eleicao
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: eleicao
+    ports:
+      - "5432:5432"           # Mapeia a porta do PostgreSQL para a máquina local

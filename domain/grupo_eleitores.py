@@ -5,7 +5,8 @@ from datetime import datetime
 
 class GrupoEleitores:
     
-    def __init__(self, id: int,  nome: str, descricao: str, ativo: bool = True):
+    def __init__(self, id: int,  nome: str, descricao: str, ativo: bool = True, 
+                 lista_eleitores: List[Eleitor] = None):
         self.id = id
         self.nome = nome
         self.descricao = descricao
@@ -14,7 +15,6 @@ class GrupoEleitores:
         self.data_cadastro = datetime.now()
         self.data_atualizacao = datetime.now()
         self.verifica_se_nome_nao_e_falsy()
-        self.verifica_nome_unico()
     
     
 

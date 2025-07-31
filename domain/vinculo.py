@@ -11,7 +11,6 @@ class Vinculo:
         self.id_pessoa = id_pessoa
         self.curso = curso
         
-        self.verifica_matricula_unica()
         self.validar_matricula()
         self.verifica_se_matricula_nao_e_falsy()
         self.verifica_se_tipo_nao_e_falsy()

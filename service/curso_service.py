@@ -10,10 +10,12 @@ class CursoService:
     def salvar(self, curso):
         # Verifica se a etapa existe
         if curso.etapa:
-            etapa = self.etapa_repository.buscar_por_id(curso.etapa.etapa, curso.etapa.turno)
+            print(f"Verificando etapa com ID: {curso.etapa.id}")
+            etapa = self.etapa_repository.buscar_por_id(curso.etapa.id)
             if not etapa:
                 raise ValueError("Etapa associada ao curso não encontrada.")
-        
+        if self.curso_repository.get_nome_by_nome(curso.nome):
+            raise ValueError("Curso com nome já cadastrado.")
         return self.curso_repository.salvar(curso)
 
     def buscar_por_id(self, curso_id: int):
