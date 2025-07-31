@@ -1,6 +1,52 @@
-# Ignore arquivos Python compilados
+# Bytecode
 __pycache__/
 *.py[cod]
+*$py.class
 
-# Ignore ambientes virtuais
+# Virtualenv
+.venv/
 venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Logs e dumps
+*.log
+*.out
+*.bak
+*.swp
+
+# Banco SQLite (se estiver usando)
+*.sqlite3
+*.db
+
+# Arquivos de configuração locais
+.env
+.env.*
+
+# Teste ou cache de testes
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+
+# Compilados gRPC
+*_pb2.py
+*_pb2_grpc.py
+
+# Migrations (opcional se for usar Alembic)
+migrations/
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Arquivos do sistema
+desktop.ini
