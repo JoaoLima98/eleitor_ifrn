@@ -1,5 +1,6 @@
 from domain.pessoa import Pessoa
-from sqlalchemy import select
+from domain.vinculo import Vinculo
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from infra.db import SessionLocal
 from models import models
@@ -69,5 +70,45 @@ class PessoaRepository:
                 if model is None:
                     return None
                 return model
+        except Exception as e:
+            raise e
+    
+    def atualizar(self, pessoa: Pessoa, pessoa_id: int):
+        try:
+            with SessionLocal() as session:
+                result = session.execute(
+                    update(models.PessoaModel)
+                    .where(models.PessoaModel.id == pessoa_id)
+                    .values(nome=pessoa.nome,
+                            cpf=pessoa.cpf,
+                            email=pessoa.email,
+                            data_nascimento=pessoa.data_nascimento,)
+                )
+                session.commit()
+                return result
+        except Exception as e:
+            raise e
+        
+    def remover(self, pessoa_id: int):
+        try:
+            with SessionLocal() as session:
+                session.query(models.PessoaModel).filter(models.PessoaModel.id == pessoa_id).delete()
+                session.commit()
+        except Exception as e:
+            raise e
+        
+    def adicionar_vinculo(self, pessoa_id: int, vinculo: Vinculo):
+        try:
+            with SessionLocal() as session:
+                pessoa = session.get(models.PessoaModel, pessoa_id)
+                vinculo_novo = models.VinculoModel(
+                id=vinculo.id,
+                tipo=vinculo.tipo.value if hasattr(vinculo.tipo, "value") else vinculo.tipo,
+                pessoa=pessoa,
+                curso_id=vinculo.curso.id if vinculo.curso else None
+            )
+            session.add(vinculo_novo)
+            session.commit()
+            session.refresh(vinculo_novo)
         except Exception as e:
             raise e

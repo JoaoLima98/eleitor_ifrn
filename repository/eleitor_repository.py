@@ -1,4 +1,6 @@
 from models import models
+from domain.eleitor import Eleitor
+from sqlalchemy import update
 from sqlalchemy.orm import joinedload
 from infra.db import SessionLocal  # SessionLocal é sessionmaker configurado
 
@@ -35,3 +37,23 @@ class EleitorRepository:
         except Exception as e:
             raise e
     
+    def atualizar(self, eleitor: Eleitor, eleitor_id: int):
+        try:
+            with SessionLocal() as session:
+                result = session.execute(
+                    update(models.EleitorModel)
+                    .where(models.EleitorModel.id == eleitor_id)
+                    .values(status=eleitor.status.name)
+                )
+                session.commit()
+                return result
+        except Exception as e:
+            raise e
+        
+    def remover(self, eleitor_id: int):
+        try:
+            with SessionLocal() as session:
+                session.query(models.EleitorModel).filter(models.EleitorModel.id == eleitor_id).delete()
+                session.commit()
+        except Exception as e:
+            raise e

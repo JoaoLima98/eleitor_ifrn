@@ -1,6 +1,6 @@
 from models import models
 from domain.vinculo import Vinculo
-from sqlalchemy import select
+from sqlalchemy import select, update
 from domain.curso import Curso
 from domain.enum.tipo_vinculo import TipoVinculo
 from infra.db import SessionLocal
@@ -83,3 +83,49 @@ class VinculoRepository:
                 )
         except Exception as e:
             raise e
+
+    def remover(self, vinculo_id: int):
+            try:
+                with SessionLocal() as session:
+                    session.query(models.VinculoModel).filter(models.VinculoModel.id == vinculo_id).delete()
+                    session.commit()
+            except Exception as e:
+                raise e
+    
+    def remover_curso_do_vinculo(self, curso_id: int):
+        try:
+            with SessionLocal() as session:
+                session.execute(
+                    update(models.VinculoModel)
+                    .where(models.VinculoModel.curso_id == curso_id)
+                    .values(curso_id=None))
+            session.commit()
+        except Exception as e:
+                raise e
+    def atualizar(self, vinculo: Vinculo, vinculo_id: int):
+        try:
+            with SessionLocal() as session:
+                result = session.execute(
+                    update(models.VinculoModel)
+                    .where(models.VinculoModel.id == vinculo_id)
+                    .values(matricula=vinculo.matricula,
+                    tipo=vinculo.tipo,
+                    pessoa_id=vinculo.id_pessoa,
+                    curso_id=vinculo.curso.id)
+                )
+                session.commit()
+                return result
+        except Exception as e:
+            raise e
+        
+    def getVinculosByIdPessoa(self, pessoa_id):
+        try:
+            with SessionLocal() as session:
+                result = session.execute(
+                    select(models.VinculoModel).where(models.VinculoModel.pessoa_id == pessoa_id)
+                )
+                return result.scalars().all()
+        except Exception as e:
+            raise e
+            
+        

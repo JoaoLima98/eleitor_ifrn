@@ -27,3 +27,7 @@ class EleitorService:
 
         # Salva eleitor (supondo que Pessoa já existe)
         return self.eleitor_repository.salvar(eleitor)
+    def atualizar(self, eleitor, eleitor_id):
+        return self.eleitor_repository.atualizar(eleitor, eleitor_id)
+    def remover(self, eleitor_id: int):
+        return self.eleitor_repository.remover(eleitor_id)

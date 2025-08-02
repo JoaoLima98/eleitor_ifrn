@@ -1,7 +1,7 @@
 from models import models
 from domain.etapa import Etapa
 from infra.db import SessionLocal
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 class EtapaRepository:
     def salvar(self, etapa):
@@ -51,5 +51,27 @@ class EtapaRepository:
                 if model is None:
                     return None
                 return (model.id, model.etapa, model.turno)
+        except Exception as e:
+            raise e
+
+    def atualizar(self, etapa: Etapa, etapa_id: int):
+        try:
+            with SessionLocal() as session:
+                result = session.execute(
+                    update(models.EtapaModel)
+                    .where(models.EtapaModel.id == etapa_id)
+                    .values(etapa=etapa.etapa,
+                    turno=etapa.turno)
+                )
+                session.commit()
+                return result
+        except Exception as e:
+            raise e
+        
+    def remover(self, etapa_id: int):
+        try:
+            with SessionLocal() as session:
+                session.query(models.EtapaModel).filter(models.EtapaModel.id == etapa_id).delete()
+                session.commit()
         except Exception as e:
             raise e
