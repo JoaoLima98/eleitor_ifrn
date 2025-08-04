@@ -1,0 +1,388 @@
+syntax = "proto3";
+package sysele;
+
+// Enumerações
+enum StatusEnum {
+  ATIVO = 0;
+  INATIVO = 1;
+  SUSPENSO = 2;
+}
+
+enum TipoVinculo {
+  DISCENTE = 0;
+  DOCENTE = 1;
+}
+
+// Mensagens das Entidades
+message Etapa {
+  int32 id = 1;
+  int32 etapa = 2;
+  string turno = 3;
+}
+
+message Curso {
+  int32 id = 1;
+  string nome = 2;
+  string descricao = 3;
+  Etapa etapa = 4;
+}
+
+message Pessoa {
+  int32 id = 1;
+  string nome = 5;
+  string cpf = 2;
+  string email = 3;
+  string data_nascimento = 4; // Formato YYYY-MM-DD
+  repeated Vinculo vinculos = 6;
+}
+
+message Vinculo {
+  int32 id = 1;
+  string matricula = 2;
+  TipoVinculo tipo = 3;
+  int32 id_pessoa = 4;
+  Curso curso = 5;
+}
+
+message Eleitor {
+  int32 id = 1;
+  string nome = 2;
+  string email = 3;
+  string cpf = 4;
+  string data_nascimento = 5;
+  StatusEnum status = 6;
+}
+
+message GrupoEleitores {
+  int32 id = 1;
+  string nome = 2;
+  string descricao = 3;
+  bool ativo = 4;
+  repeated Eleitor eleitores = 5;
+}
+
+// Serviço de Etapa
+message SalvarEtapaRequest {
+  Etapa etapa = 1;
+}
+
+message SalvarEtapaResponse {
+  Etapa etapa = 1;
+}
+
+message BuscarEtapaPorIdRequest {
+  int32 etapa_id = 1;
+}
+
+message BuscarEtapaPorIdResponse {
+  Etapa etapa = 1;
+}
+
+message AtualizarEtapaRequest {
+  int32 etapa_id = 1;
+  Etapa etapa = 2;
+}
+
+message AtualizarEtapaResponse {
+  bool sucesso = 1;
+}
+
+message RemoverEtapaRequest {
+  int32 etapa_id = 1;
+}
+
+message RemoverEtapaResponse {
+  bool sucesso = 1;
+}
+
+// Serviço de Curso
+message SalvarCursoRequest {
+  Curso curso = 1;
+}
+
+message SalvarCursoResponse {
+  Curso curso = 1;
+}
+
+message BuscarCursoPorIdRequest {
+  int32 curso_id = 1;
+}
+
+message BuscarCursoPorIdResponse {
+  Curso curso = 1;
+}
+
+message GetNomeByNomeRequest {
+  string nome = 1;
+}
+
+message GetNomeByNomeResponse {
+  bool existe = 1;
+}
+
+message AtualizarCursoRequest {
+  int32 curso_id = 1;
+  Curso curso = 2;
+}
+
+message AtualizarCursoResponse {
+  bool sucesso = 1;
+}
+
+message RemoverCursoRequest {
+  int32 curso_id = 1;
+}
+
+message RemoverCursoResponse {
+  bool sucesso = 1;
+}
+
+// Serviço de Pessoa
+message SalvarPessoaRequest {
+  Pessoa pessoa = 1;
+}
+
+message SalvarPessoaResponse {
+  Pessoa pessoa = 1;
+}
+
+message BuscarPessoaPorCpfRequest {
+  string cpf = 1;
+}
+
+message BuscarPessoaPorCpfResponse {
+  Pessoa pessoa = 1;
+}
+
+message BuscarPessoaPorEmailRequest {
+  string email = 1;
+}
+
+message BuscarPessoaPorEmailResponse {
+  Pessoa pessoa = 1;
+}
+
+message AtualizarPessoaRequest {
+  int32 pessoa_id = 1;
+  Pessoa pessoa = 2;
+}
+
+message AtualizarPessoaResponse {
+  bool sucesso = 1;
+}
+
+message RemoverPessoaRequest {
+  int32 pessoa_id = 1;
+}
+
+message RemoverPessoaResponse {
+  bool sucesso = 1;
+}
+
+message AdicionarVinculoRequest {
+  int32 pessoa_id = 1;
+  Vinculo vinculo = 2;
+}
+
+message AdicionarVinculoResponse {
+  bool sucesso = 1;
+}
+
+// Serviço de Vinculo
+message SalvarVinculoRequest {
+  Vinculo vinculo = 1;
+}
+
+message SalvarVinculoResponse {
+  Vinculo vinculo = 1;
+}
+
+message BuscarVinculoPorIdRequest {
+  int32 vinculo_id = 1;
+}
+
+message BuscarVinculoPorIdResponse {
+  Vinculo vinculo = 1;
+}
+
+message AtualizarVinculoRequest {
+  int32 vinculo_id = 1;
+  Vinculo vinculo = 2;
+}
+
+message AtualizarVinculoResponse {
+  bool sucesso = 1;
+}
+
+message RemoverVinculoRequest {
+  int32 vinculo_id = 1;
+}
+
+message RemoverVinculoResponse {
+  bool sucesso = 1;
+}
+
+message RemoverCursoDoVinculoRequest {
+  int32 curso_id = 1;
+}
+
+message RemoverCursoDoVinculoResponse {
+  bool sucesso = 1;
+}
+
+// Serviço de Eleitor
+message SalvarEleitorRequest {
+  Eleitor eleitor = 1;
+}
+
+message SalvarEleitorResponse {
+  Eleitor eleitor = 1;
+}
+
+message AtualizarEleitorRequest {
+  int32 eleitor_id = 1;
+  Eleitor eleitor = 2;
+}
+
+message AtualizarEleitorResponse {
+  bool sucesso = 1;
+}
+
+message RemoverEleitorRequest {
+  int32 eleitor_id = 1;
+}
+
+message RemoverEleitorResponse {
+  bool sucesso = 1;
+}
+
+// Serviço de GrupoEleitores
+message SalvarGrupoRequest {
+  GrupoEleitores grupo = 1;
+}
+
+message SalvarGrupoResponse {
+  GrupoEleitores grupo = 1;
+}
+
+message BuscarGrupoPorIdRequest {
+  int32 grupo_id = 1;
+}
+
+message BuscarGrupoPorIdResponse {
+  GrupoEleitores grupo = 1;
+}
+
+message BuscarGrupoPorNomeRequest {
+  string nome = 1;
+}
+
+message BuscarGrupoPorNomeResponse {
+  GrupoEleitores grupo = 1;
+}
+
+message AdicionarEleitorRequest {
+  int32 grupo_id = 1;
+  int32 eleitor_id = 2;
+}
+
+message AdicionarEleitorResponse {
+  GrupoEleitores grupo = 1;
+}
+
+message RemoverEleitorDoGrupoRequest {
+  int32 grupo_id = 1;
+  int32 eleitor_id = 2;
+}
+
+message RemoverEleitorDoGrupoResponse {
+  GrupoEleitores grupo = 1;
+}
+
+message AtivaInativaGrupoRequest {
+  int32 grupo_id = 1;
+}
+
+message AtivaInativaGrupoResponse {
+  bool ativo = 1;
+}
+
+message ListarEleitoresPorGrupoRequest {
+  int32 grupo_id = 1;
+}
+
+message ListarEleitoresPorGrupoResponse {
+  repeated Eleitor eleitores = 1;
+}
+
+// CORREÇÃO: Removido o campo 'grupos' da requisição
+message ListarTodosGruposRequest {}
+
+message ListarTodosGruposResponse {
+  repeated GrupoEleitores grupos = 1;
+}
+
+message AtualizarGrupoRequest {
+  int32 grupo_id = 1;
+  GrupoEleitores grupo = 2;
+}
+
+message AtualizarGrupoResponse {
+  bool sucesso = 1;
+}
+
+message RemoverGrupoRequest {
+  int32 grupo_id = 1;
+}
+
+message RemoverGrupoResponse {
+  bool sucesso = 1;
+}
+
+// Serviço unificado
+service SistemaVotacaoService {
+  // Etapa
+  rpc SalvarEtapa(SalvarEtapaRequest) returns (SalvarEtapaResponse);
+  rpc BuscarEtapaPorId(BuscarEtapaPorIdRequest) returns (BuscarEtapaPorIdResponse);
+  rpc AtualizarEtapa(AtualizarEtapaRequest) returns (AtualizarEtapaResponse);
+  rpc RemoverEtapa(RemoverEtapaRequest) returns (RemoverEtapaResponse);
+  
+  // Curso
+  rpc SalvarCurso(SalvarCursoRequest) returns (SalvarCursoResponse);
+  rpc BuscarCursoPorId(BuscarCursoPorIdRequest) returns (BuscarCursoPorIdResponse);
+  rpc GetNomeByNome(GetNomeByNomeRequest) returns (GetNomeByNomeResponse);
+  rpc AtualizarCurso(AtualizarCursoRequest) returns (AtualizarCursoResponse);
+  rpc RemoverCurso(RemoverCursoRequest) returns (RemoverCursoResponse);
+  
+  // Pessoa
+  rpc SalvarPessoa(SalvarPessoaRequest) returns (SalvarPessoaResponse);
+  rpc BuscarPessoaPorCpf(BuscarPessoaPorCpfRequest) returns (BuscarPessoaPorCpfResponse);
+  rpc BuscarPessoaPorEmail(BuscarPessoaPorEmailRequest) returns (BuscarPessoaPorEmailResponse);
+  rpc AtualizarPessoa(AtualizarPessoaRequest) returns (AtualizarPessoaResponse);
+  rpc RemoverPessoa(RemoverPessoaRequest) returns (RemoverPessoaResponse);
+  rpc AdicionarVinculo(AdicionarVinculoRequest) returns (AdicionarVinculoResponse);
+  
+  // Vinculo
+  rpc SalvarVinculo(SalvarVinculoRequest) returns (SalvarVinculoResponse);
+  rpc BuscarVinculoPorId(BuscarVinculoPorIdRequest) returns (BuscarVinculoPorIdResponse);
+  rpc AtualizarVinculo(AtualizarVinculoRequest) returns (AtualizarVinculoResponse);
+  rpc RemoverVinculo(RemoverVinculoRequest) returns (RemoverVinculoResponse);
+  rpc RemoverCursoDoVinculo(RemoverCursoDoVinculoRequest) returns (RemoverCursoDoVinculoResponse);
+  
+  // Eleitor
+  rpc SalvarEleitor(SalvarEleitorRequest) returns (SalvarEleitorResponse);
+  rpc AtualizarEleitor(AtualizarEleitorRequest) returns (AtualizarEleitorResponse);
+  rpc RemoverEleitor(RemoverEleitorRequest) returns (RemoverEleitorResponse);
+  
+  // GrupoEleitores
+  rpc SalvarGrupo(SalvarGrupoRequest) returns (SalvarGrupoResponse);
+  rpc BuscarGrupoPorId(BuscarGrupoPorIdRequest) returns (BuscarGrupoPorIdResponse);
+  rpc BuscarGrupoPorNome(BuscarGrupoPorNomeRequest) returns (BuscarGrupoPorNomeResponse);
+  rpc AdicionarEleitor(AdicionarEleitorRequest) returns (AdicionarEleitorResponse);
+  rpc RemoverEleitorDoGrupo(RemoverEleitorDoGrupoRequest) returns (RemoverEleitorDoGrupoResponse);
+  rpc AtivaInativaGrupo(AtivaInativaGrupoRequest) returns (AtivaInativaGrupoResponse);
+  rpc ListarEleitoresPorGrupo(ListarEleitoresPorGrupoRequest) returns (ListarEleitoresPorGrupoResponse);
+  rpc ListarTodosGrupos(ListarTodosGruposRequest) returns (ListarTodosGruposResponse);
+  rpc AtualizarGrupo(AtualizarGrupoRequest) returns (AtualizarGrupoResponse);
+  rpc RemoverGrupo(RemoverGrupoRequest) returns (RemoverGrupoResponse);
+}

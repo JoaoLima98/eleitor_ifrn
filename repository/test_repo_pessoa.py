@@ -1,3 +1,8 @@
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from service.pessoa_service import PessoaService
 from service.etapa_service import EtapaService
 from service.curso_service import CursoService
@@ -17,21 +22,21 @@ from domain.etapa import Etapa
 # Exemplo de classe Pessoa (ajuste conforme seu DTO ou modelo de entrada)
 
 # Crie uma pessoa de teste
-etapa_teste = Etapa(id=9,etapa=15, turno="Manhã")  # ajuste os valores conforme necessário
-service_etapa = EtapaService()
-'''etapa_salva = service_etapa.salvar(etapa_teste)'''
-curso_teste = Curso(4 ,nome="Curso Teste2", descricao="Descrição do curso1", etapa=etapa_teste)
-service_curso = CursoService()
-'''service_curso.salvar(curso_teste)'''
+etapa_teste = Etapa(id=1,etapa=15, turno="Manhã")  # ajuste os valores conforme necessário
+'''service_etapa = EtapaService()
+etapa_salva = service_etapa.salvar(etapa_teste)'''
+curso_teste = Curso(1 ,nome="Curso Teste2", descricao="Descrição do curso1", etapa=etapa_teste)
+'''service_curso = CursoService()
+service_curso.salvar(curso_teste)'''
 
 vinculos_teste = [
-    Vinculo(id=3, matricula="12345678901231", tipo=2, id_pessoa=2, curso=curso_teste),
+    Vinculo(id=3, matricula="12345678901231", tipo=2, id_pessoa=1, curso=curso_teste),
 ]
-
-'''service_vinculo = VinculoService()
+'''
+service_vinculo = VinculoService()
 service_vinculo.salvar(vinculos_teste)'''
 pessoa_teste = Pessoa(
-    id=2,
+    id=1,
     cpf="89097712084",
     email="fulano@teste.com",
     data_nascimento=date(2000, 1, 1),
@@ -61,6 +66,6 @@ grupo_teste = GrupoEleitores(
     ativo=True,
     lista_eleitores=[eleitor_teste]
 )
-service_grupo = GrupoEleitoresService()
-'service_grupo.salvar(grupo_teste)'
-service_grupo.adicionar_eleitor(grupo_teste.id, eleitor_teste.id)
+'''service_grupo = GrupoEleitoresService()
+service_grupo.salvar(grupo_teste)
+service_grupo.adicionar_eleitor(grupo_teste.id, eleitor_teste.id)'''

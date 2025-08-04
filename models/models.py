@@ -31,7 +31,7 @@ class CursoModel(Base):
     descricao = Column(String, nullable=False)
     
     # Foreign key para EtapaModel.id
-    etapa_id = Column(Integer, ForeignKey("etapas.id"), nullable=True)
+    etapa_id = Column(Integer, ForeignKey("etapas.id"), nullable=False)
     
     data_criacao = Column(DateTime, default=datetime.datetime.utcnow)
     data_atualizacao = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
@@ -47,21 +47,25 @@ class PessoaModel(Base):
     nome = Column(String, nullable=False)
     cpf = Column(String, unique=True, nullable=False)
     email = Column(String, nullable=False)
-    data_nascimento = Column(Date, nullable=False)
+    data_nascimento = Column(String, nullable=False)
 
     data_criacao = Column(DateTime, default=datetime.datetime.utcnow)
     data_atualizacao = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     vinculos = relationship("VinculoModel", back_populates="pessoa", cascade="all, delete-orphan")
 
+class TipoVinculo(int, enum.Enum):
+    DISCENTE = 1
+    DOCENTE = 2
+
 class VinculoModel(Base):
     __tablename__ = "vinculos"
 
     id = Column(Integer, primary_key=True, index=True)
-    matricula = Column(String, unique=True, nullable=False)  # << Adicione aqui!
-    tipo = Column(String, nullable=False)
-    pessoa_id = Column(Integer, ForeignKey("pessoas.id"), nullable=False)
-    curso_id = Column(Integer, ForeignKey("cursos.id"), nullable=False)
+    matricula = Column(String, unique=True, nullable=False)
+    tipo = Column(Enum(TipoVinculo, native_enum=False), nullable=False)
+    pessoa_id = Column(Integer, ForeignKey("pessoas.id"))
+    curso_id = Column(Integer, ForeignKey("cursos.id", ondelete="SET NULL"), nullable=True)
 
     data_criacao = Column(DateTime, default=datetime.datetime.utcnow)
     data_atualizacao = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)

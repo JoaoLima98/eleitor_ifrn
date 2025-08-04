@@ -1,34 +1,42 @@
 from repository.pessoa_repository import PessoaRepository
+from domain.vinculo import Vinculo
 import re
 
 class PessoaService:
   
     def __init__(self):
-        self.repository = PessoaRepository()
+        self.pessoa_repository = PessoaRepository()
   
     def salvar(self, pessoa):
         if not self.validar_cpf(pessoa.cpf):
             raise ValueError("CPF inválido.")
         
-        existente_cpf = self.repository.buscar_por_cpf(pessoa.cpf)
+        existente_cpf = self.pessoa_repository.buscar_por_cpf(pessoa.cpf)
         if existente_cpf and existente_cpf.id != pessoa.id:
             raise ValueError("CPF já cadastrado.")
 
-        existente_email = self.repository.buscar_por_email(pessoa.email)
+        existente_email = self.pessoa_repository.buscar_por_email(pessoa.email)
         if existente_email and existente_email.id != pessoa.id:
             raise ValueError("Email já cadastrado.")
 
-        return self.repository.salvar(pessoa)
+        return self.pessoa_repository.salvar(pessoa)
       
     def buscar_por_cpf(self, cpf: str):
         if not self.validar_cpf(cpf):
             raise ValueError("CPF inválido.")
-        return self.repository.buscar_por_cpf(cpf)
+        return self.pessoa_repository.buscar_por_cpf(cpf)
     
     def buscar_por_email(self, email: str):
         if not email:
             raise ValueError("Email inválido.")
-        return self.repository.buscar_por_email(email)
+        return self.pessoa_repository.buscar_por_email(email)
+    
+    def atualizar(self, pessoa, pessoa_id):
+            return self.pessoa_repository.atualizar(pessoa, pessoa_id)
+    def remover(self, pessoa_id: int):
+        return self.pessoa_repository.remover(pessoa_id)
+    def adicionar_vinculo(self, pessoa_id: int, vinculo: Vinculo):
+        return self.pessoa_repository.adicionar_vinculo(pessoa_id, vinculo)
       
 
     def validar_cpf(self, cpf: str):

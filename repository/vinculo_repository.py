@@ -1,6 +1,6 @@
 from models import models
 from domain.vinculo import Vinculo
-from sqlalchemy import select
+from sqlalchemy import select, update, joinedload
 from domain.curso import Curso
 from domain.enum.tipo_vinculo import TipoVinculo
 from infra.db import SessionLocal
@@ -10,6 +10,7 @@ class VinculoRepository:
     def salvar(self, vinculo):
         try:
             with SessionLocal() as session:
+                # Criação e persistência do vínculo
                 model = models.VinculoModel(
                     id=vinculo.id,
                     matricula=vinculo.matricula,
@@ -19,9 +20,29 @@ class VinculoRepository:
                 )
                 session.add(model)
                 session.flush()
-                session.refresh(model)
                 session.commit()
-                return model
+
+                # Recarregar vínculo com curso usando joinedload
+                model = session.query(models.VinculoModel)\
+                    .options(joinedload(models.VinculoModel.curso))\
+                    .filter_by(id=model.id).one()
+
+                # Montagem do domínio Curso
+                curso = Curso(
+                    id=model.curso.id,
+                    nome=model.curso.nome,
+                    descricao=model.curso.descricao,
+                    etapa=None  # Carregar etapa, se necessário
+                )
+
+                # Retorno do domínio Vinculo
+                return Vinculo(
+                    id=model.id,
+                    matricula=model.matricula,
+                    tipo=TipoVinculo[model.tipo],
+                    pessoa_id=model.pessoa_id,
+                    curso=curso
+                )
         except Exception as e:
             raise e
 
@@ -83,3 +104,49 @@ class VinculoRepository:
                 )
         except Exception as e:
             raise e
+
+    def remover(self, vinculo_id: int):
+            try:
+                with SessionLocal() as session:
+                    session.query(models.VinculoModel).filter(models.VinculoModel.id == vinculo_id).delete()
+                    session.commit()
+            except Exception as e:
+                raise e
+    
+    def remover_curso_do_vinculo(self, curso_id: int):
+        try:
+            with SessionLocal() as session:
+                session.execute(
+                    update(models.VinculoModel)
+                    .where(models.VinculoModel.curso_id == curso_id)
+                    .values(curso_id=None))
+            session.commit()
+        except Exception as e:
+                raise e
+    def atualizar(self, vinculo: Vinculo, vinculo_id: int):
+        try:
+            with SessionLocal() as session:
+                result = session.execute(
+                    update(models.VinculoModel)
+                    .where(models.VinculoModel.id == vinculo_id)
+                    .values(matricula=vinculo.matricula,
+                    tipo=vinculo.tipo,
+                    pessoa_id=vinculo.id_pessoa,
+                    curso_id=vinculo.curso.id)
+                )
+                session.commit()
+                return result
+        except Exception as e:
+            raise e
+        
+    def getVinculosByIdPessoa(self, pessoa_id):
+        try:
+            with SessionLocal() as session:
+                result = session.execute(
+                    select(models.VinculoModel).where(models.VinculoModel.pessoa_id == pessoa_id)
+                )
+                return result.scalars().all()
+        except Exception as e:
+            raise e
+            
+        

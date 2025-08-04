@@ -11,7 +11,7 @@ class GrupoEleitores:
         self.nome = nome
         self.descricao = descricao
         self.ativo = ativo
-        self.lista_eleitores: List[Eleitor] = []
+        self.lista_eleitores: List[Eleitor] = lista_eleitores
         self.data_cadastro = datetime.now()
         self.data_atualizacao = datetime.now()
         self.verifica_se_nome_nao_e_falsy()

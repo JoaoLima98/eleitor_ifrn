@@ -1,11 +1,13 @@
 
 from repository.curso_repository import CursoRepository
 from repository.etapa_repository import EtapaRepository
+from service.vinculo_service import VinculoService
 
 class CursoService:
     def __init__(self):
         self.curso_repository = CursoRepository()
         self.etapa_repository = EtapaRepository()
+        self.vinculo_service = VinculoService()
 
     def salvar(self, curso):
         # Verifica se a etapa existe
@@ -23,3 +25,10 @@ class CursoService:
 
     def get_nome_by_nome(self, nome: str) -> bool:
         return self.curso_repository.get_nome_by_nome(nome)
+    
+    def atualizar(self, curso, curso_id):
+        return self.curso_repository.atualizar(curso, curso_id)
+    def remover(self, curso_id: int):
+        self.vinculo_service.remover_curso_do_vinculo(curso_id)
+        return self.curso_repository.remover(curso_id)
+    

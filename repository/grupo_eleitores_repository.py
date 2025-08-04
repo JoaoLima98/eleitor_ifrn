@@ -1,4 +1,5 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
+from sqlalchemy.orm import selectinload
 from models import models
 from domain.grupo_eleitores import GrupoEleitores
 from domain.eleitor import Eleitor
@@ -20,51 +21,76 @@ class GrupoEleitoresRepository:
             return grupo
 
     def buscar_por_nome(self, nome: str) -> GrupoEleitores | None:
-        with SessionLocal() as db:
-            model = db.execute(
-                select(models.GrupoEleitoresModel).where(models.GrupoEleitoresModel.nome == nome)
-            ).scalar_one_or_none()
+        try: 
+            with SessionLocal() as db:
+                stmt = (
+                    select(models.GrupoEleitoresModel)
+                    .options(selectinload(models.GrupoEleitoresModel.eleitores))
+                    .where(models.GrupoEleitoresModel.nome == nome)
+                )
+                result = db.execute(stmt).scalar_one_or_none()
 
-            if model is None:
-                return None
+                if result is None:
+                    return None
 
-            return GrupoEleitores(
-                id=model.id,
-                nome=model.nome,
-                descricao=model.descricao,
-                ativo=model.ativo
-            )
+                grupo = GrupoEleitores(
+                    id=result.id,
+                    nome=result.nome,
+                    descricao=result.descricao,
+                    ativo=result.ativo
+                )
+
+                for eleitor_model in result.eleitores:
+                    eleitor = Eleitor(
+                        id=eleitor_model.id,
+                        nome=eleitor_model.nome,
+                        email=eleitor_model.email,
+                        cpf=eleitor_model.cpf,
+                        data_nascimento=eleitor_model.data_nascimento,
+                        status=eleitor_model.status,
+                        vinculos=[]  # carregue vínculos se precisar
+                    )
+                    grupo.append_lista_eleitores(eleitor)
+
+                return grupo.nome
+        except Exception as e:
+            raise e
 
     def buscar_por_id(self, grupo_id: int) -> GrupoEleitores | None:
-        with SessionLocal() as db:
-            model = db.get(models.GrupoEleitoresModel, grupo_id)
-            if model is None:
-                return None
-
-            grupo = GrupoEleitores(
-                id=model.id,
-                nome=model.nome,
-                descricao=model.descricao,
-                ativo=model.ativo
-            )
-
-            for eleitor_model in model.eleitores:
-                eleitor = Eleitor(
-                    id=eleitor_model.id,
-                    nome=eleitor_model.nome,
-                    email=eleitor_model.email,
-                    cpf=eleitor_model.cpf,
-                    data_nascimento=eleitor_model.data_nascimento,
-                    status=eleitor_model.status,
-                    vinculos=[]  # pode carregar vínculos se quiser
+        try: 
+            with SessionLocal() as db:
+                stmt = (
+                    select(models.GrupoEleitoresModel)
+                    .options(selectinload(models.GrupoEleitoresModel.eleitores))
+                    .where(models.GrupoEleitoresModel.id == grupo_id)
                 )
-                grupo.append_lista_eleitores(eleitor)
+                result = db.execute(stmt).scalar_one_or_none()
 
-            return grupo
+                if result is None:
+                    return None
 
-    def nome_existe(self, nome: str) -> bool:
-        with SessionLocal() as db:
-            return db.query(models.GrupoEleitoresModel).filter(models.GrupoEleitoresModel.nome == nome).first() is not None
+                grupo = GrupoEleitores(
+                    id=result.id,
+                    nome=result.nome,
+                    descricao=result.descricao,
+                    ativo=result.ativo
+                )
+
+                for eleitor_model in result.eleitores:
+                    eleitor = Eleitor(
+                        id=eleitor_model.id,
+                        nome=eleitor_model.nome,
+                        email=eleitor_model.email,
+                        cpf=eleitor_model.cpf,
+                        data_nascimento=eleitor_model.data_nascimento,
+                        status=eleitor_model.status,
+                        vinculos=[]  # carregue vínculos se precisar
+                    )
+                    grupo.append_lista_eleitores(eleitor)
+
+                return grupo
+        except Exception as e:
+            raise e
 
     def adicionar_eleitor(self, grupo_id: int, eleitor_id):
         with SessionLocal() as session:
@@ -72,16 +98,20 @@ class GrupoEleitoresRepository:
             if not grupo:
                 raise ValueError("Grupo não encontrado.")
 
-            eleitor = session.get(models.EleitorModel, eleitor_id)
+            # normaliza: aceita tanto o inteiro quanto o objeto de domínio que tem .id
+            chave_eleitor = eleitor_id.id if hasattr(eleitor_id, "id") else eleitor_id
+
+            eleitor = session.get(models.EleitorModel, chave_eleitor)
             if not eleitor:
                 raise ValueError("Eleitor não encontrado.")
 
             if eleitor not in grupo.eleitores:
-                grupo.eleitores.append(eleitor)  # Só isso já adiciona na tabela intermediária!
-            
+                grupo.eleitores.append(eleitor)
+
             session.commit()
             session.refresh(grupo)
             return grupo
+
 
 
 
@@ -103,11 +133,17 @@ class GrupoEleitoresRepository:
             db.refresh(grupo)
             return eleitor
 
+
     def listar_grupos(self) -> list[GrupoEleitores]:
         with SessionLocal() as db:
-            grupos = db.query(models.GrupoEleitoresModel).all()
+            stmt = select(models.GrupoEleitoresModel).options(
+                selectinload(models.GrupoEleitoresModel.eleitores)
+            )
+            result = db.execute(stmt).scalars().all()
+
             lista_grupos = []
-            for model in grupos:
+
+            for model in result:
                 grupo = GrupoEleitores(
                     id=model.id,
                     nome=model.nome,
@@ -122,29 +158,63 @@ class GrupoEleitoresRepository:
                         cpf=eleitor_model.cpf,
                         data_nascimento=eleitor_model.data_nascimento,
                         status=eleitor_model.status,
-                        vinculos=[]  # pode carregar vínculos se quiser
+                        vinculos=[]
                     )
                     grupo.append_lista_eleitores(eleitor)
+
                 lista_grupos.append(grupo)
+
             return lista_grupos
 
-    @staticmethod
-    def grupo_to_grpc(grupo: GrupoEleitores):
-        return GrupoEleitoresMessage(
-            id=grupo.id,
-            nome=grupo.nome,
-            descricao=grupo.descricao,
-            ativo=grupo.ativo,
-            data_cadastro=grupo.data_cadastro.isoformat(),
-            data_atualizacao=grupo.data_atualizacao.isoformat(),
-            lista_eleitores=[
-                EleitorMessage(
-                    id=e.id,
-                    nome=e.nome,
-                    email=e.email,
-                    cpf=e.cpf,
-                    data_nascimento=e.data_nascimento.isoformat(),
-                    status=e.status.name
-                ) for e in grupo.lista_eleitores
-            ]
-        )
+
+
+    def atualizar(self, grupo: GrupoEleitores, grupo_id: int):
+        try:
+            with SessionLocal() as session:
+                result = session.execute(
+                    update(models.GrupoEleitoresModel)
+                    .where(models.GrupoEleitoresModel.id == grupo_id)
+                    .values(nome=grupo.nome,
+                descricao=grupo.descricao,
+                ativo=grupo.ativo)
+                )
+                session.commit()
+                return result
+        except Exception as e:
+            raise e
+        
+    def remover(self, grupo_id: int):
+        try:
+            with SessionLocal() as session:
+                session.query(models.GrupoEleitoresModel).filter(models.GrupoEleitoresModel.id == grupo_id).delete()
+                session.commit()
+        except Exception as e:
+            raise e
+    
+    def listar_eleitores_por_grupo_id(self, grupo_id: int) -> list[Eleitor]:
+        with SessionLocal() as db:
+            stmt = (
+                select(models.GrupoEleitoresModel)
+                .options(selectinload(models.GrupoEleitoresModel.eleitores))
+                .where(models.GrupoEleitoresModel.id == grupo_id)
+            )
+            result = db.execute(stmt).scalar_one_or_none()
+
+            if result is None:
+                return []
+
+            eleitores = []
+
+            for eleitor_model in result.eleitores:
+                eleitor = Eleitor(
+                    id=eleitor_model.id,
+                    nome=eleitor_model.nome,
+                    email=eleitor_model.email,
+                    cpf=eleitor_model.cpf,
+                    data_nascimento=eleitor_model.data_nascimento,
+                    status=eleitor_model.status,
+                    vinculos=[]  # ou carregue os vínculos aqui se necessário
+                )
+                eleitores.append(eleitor)
+
+            return eleitores
