@@ -55,15 +55,15 @@ class PessoaModel(Base):
     vinculos = relationship("VinculoModel", back_populates="pessoa", cascade="all, delete-orphan")
 
 class TipoVinculo(int, enum.Enum):
-    DISCENTE = 1
-    DOCENTE = 2
+    DISCENTE = 0
+    DOCENTE = 1
 
 class VinculoModel(Base):
     __tablename__ = "vinculos"
 
     id = Column(Integer, primary_key=True, index=True)
     matricula = Column(String, unique=True, nullable=False)
-    tipo = Column(Enum(TipoVinculo, native_enum=False), nullable=False)
+    tipo = Column(Enum(TipoVinculo, native_enum=True), nullable=False)
     pessoa_id = Column(Integer, ForeignKey("pessoas.id"))
     curso_id = Column(Integer, ForeignKey("cursos.id", ondelete="SET NULL"), nullable=True)
 
@@ -74,10 +74,10 @@ class VinculoModel(Base):
     curso = relationship("CursoModel", back_populates="vinculos")
 
 
-class StatusEnum(str, enum.Enum):
-    ATIVO = "ATIVO"
-    INATIVO = "INATIVO"
-    SUSPENSO = "SUSPENSO"
+class StatusEnum(int, enum.Enum):
+    ATIVO = 0
+    INATIVO = 1
+    SUSPENSO = 2
 
 
 class EleitorModel(Base):

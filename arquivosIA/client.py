@@ -292,9 +292,9 @@ class SistemaVotacaoClient:
                 vinculo_id=vinculo_id,
                 vinculo=sysEleitores.Vinculo(
                     matricula="2023000",
-                    tipo=2,
-                    id_pessoa=pessoa_id,
-                    curso=curso
+                    tipo=0,
+                    curso=curso,
+                    id_pessoa=pessoa_id
                 )
             )
             atualizar_response = self.stub.AtualizarVinculo(atualizar_request)

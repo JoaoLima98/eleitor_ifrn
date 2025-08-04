@@ -1,6 +1,6 @@
 from enum import IntEnum
 
 class Status(IntEnum):
-    ATIVO = 1
-    INATIVO = 2
-    SUSPENSO = 3
+    ATIVO = 0
+    INATIVO = 1
+    SUSPENSO = 2

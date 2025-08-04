@@ -93,14 +93,15 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
 
     def converter_vinculo_domain_to_pb(self, vinculo: Vinculo):
         curso_pb = self.converter_curso_domain_to_pb(vinculo.curso)
-        tipo = sysele_pb2.TipoVinculo.DISCENTE if vinculo.tipo == TipoVinculo.DISCENTE else sysele_pb2.TipoVinculo.DOCENTE
-        return sysele_pb2.Vinculo(
+        tipo = TipoVinculo.DISCENTE if vinculo.tipo == sysele_pb2.TipoVinculo.DISCENTE else TipoVinculo.DOCENTE
+        return Vinculo(
             id=vinculo.id,
             matricula=vinculo.matricula,
             tipo=tipo,
             id_pessoa=vinculo.id_pessoa,
             curso=curso_pb
         )
+
 
     def converter_vinculo_pb_to_domain(self, vinculo_pb):
         curso = self.converter_curso_pb_to_domain(vinculo_pb.curso)
@@ -112,6 +113,7 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
             id_pessoa=vinculo_pb.id_pessoa,
             curso=curso
         )
+
 
     def converter_eleitor_domain_to_pb(self, eleitor: Eleitor):
         status = {

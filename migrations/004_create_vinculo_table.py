@@ -17,7 +17,7 @@ def upgrade():
     op.create_table(
         'vinculos',
         sa.Column('id', sa.Integer, primary_key=True, index=True),
-        sa.Column('tipo', sa.String, nullable=False),
+        sa.Column('tipo', sa.Integer, nullable=False),
         sa.Column('matricula', sa.String, unique=True, nullable=False),
         sa.Column('pessoa_id', sa.Integer, sa.ForeignKey('pessoas.id'), nullable=False),
         sa.Column('curso_id', sa.Integer, sa.ForeignKey('cursos.id'), nullable=False),

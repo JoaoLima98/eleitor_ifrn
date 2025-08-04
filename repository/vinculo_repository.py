@@ -1,6 +1,7 @@
 from models import models
 from domain.vinculo import Vinculo
-from sqlalchemy import select, update, joinedload
+from sqlalchemy import select, update
+from sqlalchemy.orm import joinedload
 from domain.curso import Curso
 from domain.enum.tipo_vinculo import TipoVinculo
 from infra.db import SessionLocal
@@ -14,7 +15,7 @@ class VinculoRepository:
                 model = models.VinculoModel(
                     id=vinculo.id,
                     matricula=vinculo.matricula,
-                    tipo=vinculo.tipo,
+                    tipo=vinculo.tipo.value,
                     pessoa_id=vinculo.id_pessoa,
                     curso_id=vinculo.curso.id
                 )
@@ -39,7 +40,7 @@ class VinculoRepository:
                 return Vinculo(
                     id=model.id,
                     matricula=model.matricula,
-                    tipo=TipoVinculo[model.tipo],
+                    tipo=TipoVinculo(model.tipo),
                     pessoa_id=model.pessoa_id,
                     curso=curso
                 )
@@ -69,7 +70,7 @@ class VinculoRepository:
                 return Vinculo(
                     id=model.id,
                     matricula=model.matricula,
-                    tipo=TipoVinculo[model.tipo],
+                    tipo=TipoVinculo(model.tipo),
                     pessoa_id=model.pessoa_id,
                     curso=curso
                 )
@@ -98,7 +99,7 @@ class VinculoRepository:
                 return Vinculo(
                     id=model.id,
                     matricula=model.matricula,
-                    tipo=TipoVinculo[model.tipo],
+                    tipo=TipoVinculo(model.tipo),
                     pessoa_id=model.pessoa_id,
                     curso=curso
                 )
@@ -126,18 +127,44 @@ class VinculoRepository:
     def atualizar(self, vinculo: Vinculo, vinculo_id: int):
         try:
             with SessionLocal() as session:
-                result = session.execute(
+                session.execute(
                     update(models.VinculoModel)
                     .where(models.VinculoModel.id == vinculo_id)
-                    .values(matricula=vinculo.matricula,
-                    tipo=vinculo.tipo,
-                    pessoa_id=vinculo.id_pessoa,
-                    curso_id=vinculo.curso.id)
+                    .values(
+                        matricula=vinculo.matricula,
+                        tipo=vinculo.tipo.value,
+                        pessoa_id=vinculo.id_pessoa,
+                        curso_id=vinculo.curso.id
+                    )
                 )
                 session.commit()
-                return result
+
+                model = session.query(models.VinculoModel)\
+                    .options(joinedload(models.VinculoModel.curso))\
+                    .filter_by(id=vinculo_id).one_or_none()
+
+                if model is None:
+                    raise Exception(f"Vínculo com id {vinculo_id} não encontrado para atualização.")
+
+                curso = Curso(
+                    id=model.curso.id,
+                    nome=model.curso.nome,
+                    descricao=model.curso.descricao,
+                    etapa=None
+                )
+
+                return Vinculo(
+                    id=model.id,
+                    matricula=model.matricula,
+                    tipo=TipoVinculo(model.tipo),
+                    id_pessoa=model.pessoa_id,
+                    curso=curso
+                )
+
         except Exception as e:
             raise e
+
+
         
     def getVinculosByIdPessoa(self, pessoa_id):
         try:
