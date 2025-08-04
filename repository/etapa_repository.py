@@ -50,7 +50,7 @@ class EtapaRepository:
                 model = session.get(models.EtapaModel, id)
                 if model is None:
                     return None
-                return (model.id, model.etapa, model.turno)
+                return model
         except Exception as e:
             raise e
 

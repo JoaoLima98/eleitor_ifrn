@@ -9,7 +9,6 @@ class VinculoService:
         self.curso_repository = CursoRepository()
 
     def salvar(self, vinculo):
-        salvos = []
         lista_vinculos = self.vinculo_repository.getVinculosByIdPessoa(vinculo.id_pessoa)
 
         for vinculo_na_lista in lista_vinculos:

@@ -4,7 +4,7 @@ import re
 
 class Pessoa:
 
-    def __init__(self, id: int, cpf: str, email: str, data_nascimento: date, nome: str, vinculos = list[Vinculo] or None):
+    def __init__(self, id: int, cpf: str, email: str, data_nascimento: str, nome: str, vinculos = list[Vinculo] or None):
         self.id = id
         self.cpf = cpf
         self.email = email

@@ -47,7 +47,7 @@ class PessoaModel(Base):
     nome = Column(String, nullable=False)
     cpf = Column(String, unique=True, nullable=False)
     email = Column(String, nullable=False)
-    data_nascimento = Column(Date, nullable=False)
+    data_nascimento = Column(String, nullable=False)
 
     data_criacao = Column(DateTime, default=datetime.datetime.utcnow)
     data_atualizacao = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)

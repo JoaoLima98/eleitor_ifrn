@@ -18,7 +18,7 @@ class CursoRepository:
                 # Atualiza campos
                 model.nome = curso.nome
                 model.descricao = curso.descricao
-                model.etapa_id = curso.etapa.id if curso.etapa else None
+                model.etapa_id = curso.etapa.id if curso.etapa.id else None
 
                 session.add(model)
                 session.commit()
