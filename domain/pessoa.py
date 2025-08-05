@@ -66,6 +66,6 @@ class Pessoa:
             if vinculo.id_pessoa != self.id:
                 raise ValueError(f"Vínculo {vinculo} não corresponde ao ID da pessoa.")
     
-    def get_pessoa_id(self):
+    def get_id_pessoa(self):
         return self.id
     

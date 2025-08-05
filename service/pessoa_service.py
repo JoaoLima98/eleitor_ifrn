@@ -31,12 +31,12 @@ class PessoaService:
             raise ValueError("Email inválido.")
         return self.pessoa_repository.buscar_por_email(email)
     
-    def atualizar(self, pessoa, pessoa_id):
-            return self.pessoa_repository.atualizar(pessoa, pessoa_id)
-    def remover(self, pessoa_id: int):
-        return self.pessoa_repository.remover(pessoa_id)
-    def adicionar_vinculo(self, pessoa_id: int, vinculo: Vinculo):
-        return self.pessoa_repository.adicionar_vinculo(pessoa_id, vinculo)
+    def atualizar(self, pessoa, id_pessoa):
+            return self.pessoa_repository.atualizar(pessoa, id_pessoa)
+    def remover(self, id_pessoa: int):
+        return self.pessoa_repository.remover(id_pessoa)
+    def adicionar_vinculo(self, id_pessoa: int, vinculo: Vinculo):
+        return self.pessoa_repository.adicionar_vinculo(id_pessoa, vinculo)
       
 
     def validar_cpf(self, cpf: str):

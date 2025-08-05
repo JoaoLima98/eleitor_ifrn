@@ -85,12 +85,12 @@ def upgrade() -> None:
     op.create_table('vinculos',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('tipo', sa.String(), nullable=False),
-    sa.Column('pessoa_id', sa.Integer(), nullable=False),
+    sa.Column('id_pessoa', sa.Integer(), nullable=False),
     sa.Column('curso_id', sa.Integer(), nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=True),
     sa.Column('data_atualizacao', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['curso_id'], ['cursos.id'], ),
-    sa.ForeignKeyConstraint(['pessoa_id'], ['pessoas.id'], ),
+    sa.ForeignKeyConstraint(['id_pessoa'], ['pessoas.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_vinculos_id'), 'vinculos', ['id'], unique=False)

@@ -24,7 +24,7 @@ def upgrade() -> None:
     op.alter_column('cursos', 'etapa_id',
                existing_type=sa.INTEGER(),
                nullable=True)
-    op.alter_column('vinculos', 'pessoa_id',
+    op.alter_column('vinculos', 'id_pessoa',
                existing_type=sa.INTEGER(),
                nullable=True)
     op.alter_column('vinculos', 'curso_id',
@@ -39,7 +39,7 @@ def downgrade() -> None:
     op.alter_column('vinculos', 'curso_id',
                existing_type=sa.INTEGER(),
                nullable=False)
-    op.alter_column('vinculos', 'pessoa_id',
+    op.alter_column('vinculos', 'id_pessoa',
                existing_type=sa.INTEGER(),
                nullable=False)
     op.alter_column('cursos', 'etapa_id',

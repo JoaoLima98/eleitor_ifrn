@@ -64,7 +64,7 @@ class VinculoModel(Base):
     id = Column(Integer, primary_key=True, index=True)
     matricula = Column(String, unique=True, nullable=False)
     tipo = Column(Enum(TipoVinculo, native_enum=True), nullable=False)
-    pessoa_id = Column(Integer, ForeignKey("pessoas.id"))
+    id_pessoa = Column(Integer, ForeignKey("pessoas.id"))
     curso_id = Column(Integer, ForeignKey("cursos.id", ondelete="SET NULL"), nullable=True)
 
     data_criacao = Column(DateTime, default=datetime.datetime.utcnow)

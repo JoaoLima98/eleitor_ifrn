@@ -12,7 +12,7 @@ class PessoaRepository:
             models.VinculoModel(
                 id=vinculo.id,
                 tipo=vinculo.tipo.value if hasattr(vinculo.tipo, "value") else vinculo.tipo,
-                pessoa_id=vinculo.id_pessoa,
+                id_pessoa=vinculo.id_pessoa,
                 curso_id=vinculo.curso.id if vinculo.curso else None
             )
             for vinculo in pessoa.vinculos
@@ -73,12 +73,12 @@ class PessoaRepository:
         except Exception as e:
             raise e
     
-    def atualizar(self, pessoa: Pessoa, pessoa_id: int):
+    def atualizar(self, pessoa: Pessoa, id_pessoa: int):
         try:
             with SessionLocal() as session:
                 result = session.execute(
                     update(models.PessoaModel)
-                    .where(models.PessoaModel.id == pessoa_id)
+                    .where(models.PessoaModel.id == id_pessoa)
                     .values(nome=pessoa.nome,
                             cpf=pessoa.cpf,
                             email=pessoa.email,
@@ -89,18 +89,18 @@ class PessoaRepository:
         except Exception as e:
             raise e
         
-    def remover(self, pessoa_id: int):
+    def remover(self, id_pessoa: int):
         try:
             with SessionLocal() as session:
-                session.query(models.PessoaModel).filter(models.PessoaModel.id == pessoa_id).delete()
+                session.query(models.PessoaModel).filter(models.PessoaModel.id == id_pessoa).delete()
                 session.commit()
         except Exception as e:
             raise e
         
-    def adicionar_vinculo(self, pessoa_id: int, vinculo: Vinculo):
+    def adicionar_vinculo(self, id_pessoa: int, vinculo: Vinculo):
         try:
             with SessionLocal() as session:
-                pessoa = session.get(models.PessoaModel, pessoa_id)
+                pessoa = session.get(models.PessoaModel, id_pessoa)
                 vinculo_novo = models.VinculoModel(
                 id=vinculo.id,
                 tipo=vinculo.tipo.value if hasattr(vinculo.tipo, "value") else vinculo.tipo,

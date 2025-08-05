@@ -17,7 +17,7 @@ def run():
             matricula="2023113",
             tipo=elegivel_pb2.DISCENTE,
             id_pessoa=1,
-            curso=curso
+            curso_id=curso.id
         )
 
         pessoa = elegivel_pb2.Pessoa(

@@ -83,8 +83,8 @@ class TestPessoa(unittest.TestCase):
         self.assertEqual(len(pessoa.vinculos), 2)
         self.assertTrue(all(v.id_pessoa == pessoa.id for v in pessoa.vinculos))
     
-    def test_get_pessoa_id(self):
-        resultado = self.pessoa.get_pessoa_id()
+    def test_get_id_pessoa(self):
+        resultado = self.pessoa.get_id_pessoa()
         self.assertEqual(resultado, 1)
 
     def test_cpf_ja_cadastrado_com_service_mock(self):

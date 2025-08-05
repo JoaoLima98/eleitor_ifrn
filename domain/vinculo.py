@@ -1,15 +1,12 @@
 from domain.enum.tipo_vinculo import TipoVinculo
-from domain.curso import Curso
-
-
 
 class Vinculo:
-    def __init__(self, id: int, matricula: str, tipo: int, id_pessoa: int, curso: Curso):
+    def __init__(self, id: int, matricula: str, tipo: int, id_pessoa: int, curso_id: int):
         self.id = id
         self.matricula = matricula
         self.tipo = TipoVinculo(tipo)
         self.id_pessoa = id_pessoa
-        self.curso = curso
+        self.curso_id = curso_id
         
         self.validar_matricula()
         self.verifica_se_matricula_nao_e_falsy()

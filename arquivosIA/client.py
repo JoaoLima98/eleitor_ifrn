@@ -213,8 +213,8 @@ class SistemaVotacaoClient:
             )
             pessoa_response = self.stub.SalvarPessoa(pessoa_request)
             print(f"Pessoa salva: ID={pessoa_response.pessoa.id}, Nome={pessoa_response.pessoa.nome}")
-            pessoa_id = pessoa_response.pessoa.id
-            print(pessoa_id, "ASUIFHUAHSFHAFUHASUFH")
+            id_pessoa = pessoa_response.pessoa.id
+            print(id_pessoa, "ASUIFHUAHSFHAFUHASUFH")
             
             # Buscar pessoa por CPF
             cpf_request = sysEleitores.BuscarPessoaPorCpfRequest(cpf="61578630053")
@@ -228,7 +228,7 @@ class SistemaVotacaoClient:
             
             # Atualizar pessoa
             atualizar_request = sysEleitores.AtualizarPessoaRequest(
-                pessoa_id=pessoa_id,
+                id_pessoa=id_pessoa,
                 pessoa=sysEleitores.Pessoa(                  
                     cpf="61578630053",
                     email="joao.silva.atualizado@example.com",
@@ -241,31 +241,31 @@ class SistemaVotacaoClient:
             # print(f"Pessoa atualizada: Sucesso={atualizar_response.sucesso}")
             
             # Remover pessoa
-            # remover_request = sysEleitores.RemoverPessoaRequest(pessoa_id=pessoa_id)
+            # remover_request = sysEleitores.RemoverPessoaRequest(id_pessoa=id_pessoa)
             # remover_response = self.stub.RemoverPessoa(remover_request)
             # print(f"Pessoa removida: Sucesso={remover_response.sucesso}")
             
             self.imprimir_rodape()
-            return pessoa_id
+            return id_pessoa
             
         except Exception as e:
             self.tratar_erro(e, "teste de pessoa")
             return None
     
     # Métodos para Vinculo
-    def testar_vinculo(self, pessoa_id, curso):
+    def testar_vinculo(self, id_pessoa, curso):
         """
         Testa todos os métodos do serviço de Vínculo.
         
         Args:
-            pessoa_id (int): ID da pessoa associada ao vínculo
+            id_pessoa (int): ID da pessoa associada ao vínculo
             curso_id (int): ID do curso associado ao vínculo
             
         Returns:
             int: ID do vínculo criado
         """
         self.imprimir_cabecalho("Testando Serviço de Vínculo")
-        
+        print(curso, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
         try:
             # Salvar um novo vínculo
             vinculo_request = sysEleitores.SalvarVinculoRequest(
@@ -273,12 +273,14 @@ class SistemaVotacaoClient:
                     id=0,  # ID será gerado pelo banco
                     matricula="2023001",
                     tipo=1,
-                    id_pessoa=pessoa_id,
-                    curso=curso
+                    id_pessoa=id_pessoa,
+                    curso_id=curso.id
                 )
             )
-            print(vinculo_request)
+            print(vinculo_request, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII deu erro")
+            print(vinculo_request, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
             vinculo_response = self.stub.SalvarVinculo(vinculo_request)
+            print("CHEGOU AQUIQWURQIWRIQWUAQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
             print(f"Vínculo salvo: ID={vinculo_response.vinculo.id}, Matrícula={vinculo_response.vinculo.matricula}")
             vinculo_id = vinculo_response.vinculo.id
             
@@ -293,8 +295,8 @@ class SistemaVotacaoClient:
                 vinculo=sysEleitores.Vinculo(
                     matricula="2023000",
                     tipo=0,
-                    curso=curso,
-                    id_pessoa=pessoa_id
+                    curso_id=curso.id,
+                    id_pessoa=id_pessoa
                 )
             )
             atualizar_response = self.stub.AtualizarVinculo(atualizar_request)
@@ -313,12 +315,12 @@ class SistemaVotacaoClient:
             return None
     
     # Métodos para Eleitor
-    def testar_eleitor(self, pessoa_id):
+    def testar_eleitor(self, id_pessoa):
         """
         Testa todos os métodos do serviço de Eleitor.
         
         Args:
-            pessoa_id (int): ID da pessoa associada ao eleitor
+            id_pessoa (int): ID da pessoa associada ao eleitor
             
         Returns:
             int: ID do eleitor criado
@@ -329,7 +331,7 @@ class SistemaVotacaoClient:
             # Salvar um novo eleitor
             eleitor_request = sysEleitores.SalvarEleitorRequest(
                 eleitor=sysEleitores.Eleitor(
-                    id=pessoa_id,  # ID da pessoa
+                    id=id_pessoa,  # ID da pessoa
                     nome="João Silva",
                     email="joao.silva@example.com",
                     cpf="61578630053",
@@ -480,18 +482,18 @@ class SistemaVotacaoClient:
                 return
             
             # Testar Pessoa
-            pessoa_id = self.testar_pessoa()
-            if pessoa_id is None:
+            id_pessoa = self.testar_pessoa()
+            if id_pessoa is None:
                 print("Não foi possível criar uma pessoa. Abortando testes.")
                 return
             
             # Testar Vínculo (depende de pessoa e curso)
-            vinculo_id = self.testar_vinculo(pessoa_id, curso_id)
+            vinculo_id = self.testar_vinculo(id_pessoa, curso_id)
             if vinculo_id is None:
                 print("Não foi possível criar um vínculo. Continuando com os próximos testes.")
             
             # Testar Eleitor (depende de pessoa)
-            eleitor_id = self.testar_eleitor(pessoa_id)
+            eleitor_id = self.testar_eleitor(id_pessoa)
             if eleitor_id is None:
                 print("Não foi possível criar um eleitor. Abortando testes.")
                 return
@@ -530,23 +532,23 @@ class SistemaVotacaoClient:
             self.testar_pessoa()
         elif servico == "vinculo":
             # Para testar vinculo, precisamos de pessoa e curso
-            pessoa_id = self.testar_pessoa()
-            if pessoa_id:
+            id_pessoa = self.testar_pessoa()
+            if id_pessoa:
                 etapa_id = self.testar_etapa()
                 if etapa_id:
                     curso_id = self.testar_curso(etapa_id)
                     if curso_id:
-                        self.testar_vinculo(pessoa_id, curso_id)
+                        self.testar_vinculo(id_pessoa, curso_id)
         elif servico == "eleitor":
             # Para testar eleitor, precisamos de pessoa
-            pessoa_id = self.testar_pessoa()
-            if pessoa_id:
-                self.testar_eleitor(pessoa_id)
+            id_pessoa = self.testar_pessoa()
+            if id_pessoa:
+                self.testar_eleitor(id_pessoa)
         elif servico == "grupo":
             # Para testar grupo, precisamos de eleitor
-            pessoa_id = self.testar_pessoa()
-            if pessoa_id:
-                eleitor_id = self.testar_eleitor(pessoa_id)
+            id_pessoa = self.testar_pessoa()
+            if id_pessoa:
+                eleitor_id = self.testar_eleitor(id_pessoa)
                 if eleitor_id:
                     self.testar_grupo_eleitores(eleitor_id)
         else:

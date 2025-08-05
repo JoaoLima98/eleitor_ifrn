@@ -8,44 +8,49 @@ from infra.db import SessionLocal
 
 class VinculoRepository:
 
-    def salvar(self, vinculo):
+    def salvar(vinculo: Vinculo):
+        """
+        Cria ou atualiza um vínculo no banco de dados.
+
+        Args:
+            vinculo (Vinculo): Objeto Vinculo contendo os dados a serem salvos.
+
+        Returns:
+            models.VinculoModel: O objeto VinculoModel salvo ou atualizado.
+        """
+        db = SessionLocal()
         try:
-            with SessionLocal() as session:
-                # Criação e persistência do vínculo
-                model = models.VinculoModel(
-                    id=vinculo.id,
+            # Verifica se o vínculo já existe pela matrícula
+            db_vinculo = db.query(models.VinculoModel).filter(models.VinculoModel.matricula == vinculo.matricula).first()
+
+            if db_vinculo:
+                # Atualiza o vínculo existente
+                db_vinculo.tipo = vinculo.tipo
+                db_vinculo.id_pessoa = vinculo.id_pessoa
+                db_vinculo.curso_id = vinculo.curso_id
+                
+                db.commit()
+                db.refresh(db_vinculo)
+                return db_vinculo
+            else:
+                # Cria um novo vínculo
+                novo_vinculo = models.VinculoModel(
                     matricula=vinculo.matricula,
-                    tipo=vinculo.tipo.value,
-                    pessoa_id=vinculo.id_pessoa,
-                    curso_id=vinculo.curso.id
+                    tipo=vinculo.tipo,
+                    id_pessoa=vinculo.id_pessoa,
+                    curso_id=vinculo.curso_id
                 )
-                session.add(model)
-                session.flush()
-                session.commit()
-
-                # Recarregar vínculo com curso usando joinedload
-                model = session.query(models.VinculoModel)\
-                    .options(joinedload(models.VinculoModel.curso))\
-                    .filter_by(id=model.id).one()
-
-                # Montagem do domínio Curso
-                curso = Curso(
-                    id=model.curso.id,
-                    nome=model.curso.nome,
-                    descricao=model.curso.descricao,
-                    etapa=None  # Carregar etapa, se necessário
-                )
-
-                # Retorno do domínio Vinculo
-                return Vinculo(
-                    id=model.id,
-                    matricula=model.matricula,
-                    tipo=TipoVinculo(model.tipo),
-                    pessoa_id=model.pessoa_id,
-                    curso=curso
-                )
+                db.add(novo_vinculo)
+                db.commit()
+                db.refresh(novo_vinculo)
+                return novo_vinculo
+                
         except Exception as e:
+            db.rollback()
             raise e
+        finally:
+            db.close()
+
 
 
     def buscar_por_matricula(self, matricula: str):
@@ -58,21 +63,12 @@ class VinculoRepository:
                 if model is None:
                     return None
 
-                curso_model = session.get(models.CursoModel, model.curso_id)
-
-                curso = Curso(
-                    id=curso_model.id,
-                    nome=curso_model.nome,
-                    descricao=curso_model.descricao,
-                    etapa=None  # Carregar etapa se desejar
-                )
-
                 return Vinculo(
                     id=model.id,
                     matricula=model.matricula,
                     tipo=TipoVinculo(model.tipo),
-                    pessoa_id=model.pessoa_id,
-                    curso=curso
+                    id_pessoa=model.id_pessoa,
+                    curso_id=model.curso_id
                 )
         except Exception as e:
             raise e
@@ -87,21 +83,12 @@ class VinculoRepository:
                 if model is None:
                     return None
 
-                curso_model = session.get(models.CursoModel, model.curso_id)
-
-                curso = Curso(
-                    id=curso_model.id,
-                    nome=curso_model.nome,
-                    descricao=curso_model.descricao,
-                    etapa=None  # Carregar etapa se quiser
-                )
-
                 return Vinculo(
                     id=model.id,
                     matricula=model.matricula,
                     tipo=TipoVinculo(model.tipo),
-                    pessoa_id=model.pessoa_id,
-                    curso=curso
+                    id_pessoa=model.id_pessoa,
+                    curso_id=model.curso_id
                 )
         except Exception as e:
             raise e
@@ -133,7 +120,7 @@ class VinculoRepository:
                     .values(
                         matricula=vinculo.matricula,
                         tipo=vinculo.tipo.value,
-                        pessoa_id=vinculo.id_pessoa,
+                        id_pessoa=vinculo.id_pessoa,
                         curso_id=vinculo.curso.id
                     )
                 )
@@ -146,19 +133,12 @@ class VinculoRepository:
                 if model is None:
                     raise Exception(f"Vínculo com id {vinculo_id} não encontrado para atualização.")
 
-                curso = Curso(
-                    id=model.curso.id,
-                    nome=model.curso.nome,
-                    descricao=model.curso.descricao,
-                    etapa=None
-                )
-
                 return Vinculo(
                     id=model.id,
                     matricula=model.matricula,
                     tipo=TipoVinculo(model.tipo),
-                    id_pessoa=model.pessoa_id,
-                    curso=curso
+                    id_pessoa=model.id_pessoa,
+                    curso_id=model.curso_id
                 )
 
         except Exception as e:
@@ -166,11 +146,11 @@ class VinculoRepository:
 
 
         
-    def getVinculosByIdPessoa(self, pessoa_id):
+    def getVinculosByIdPessoa(self, id_pessoa):
         try:
             with SessionLocal() as session:
                 result = session.execute(
-                    select(models.VinculoModel).where(models.VinculoModel.pessoa_id == pessoa_id)
+                    select(models.VinculoModel).where(models.VinculoModel.id_pessoa == id_pessoa)
                 )
                 return result.scalars().all()
         except Exception as e:

@@ -41,7 +41,7 @@ message Vinculo {
   string matricula = 2;
   TipoVinculo tipo = 3;
   int32 id_pessoa = 4;
-  Curso curso = 5;
+  int32 curso_id = 5;
 }
 
 message Eleitor {
@@ -163,7 +163,7 @@ message BuscarPessoaPorEmailResponse {
 }
 
 message AtualizarPessoaRequest {
-  int32 pessoa_id = 1;
+  int32 id_pessoa = 1;
   Pessoa pessoa = 2;
 }
 
@@ -172,7 +172,7 @@ message AtualizarPessoaResponse {
 }
 
 message RemoverPessoaRequest {
-  int32 pessoa_id = 1;
+  int32 id_pessoa = 1;
 }
 
 message RemoverPessoaResponse {
@@ -180,7 +180,7 @@ message RemoverPessoaResponse {
 }
 
 message AdicionarVinculoRequest {
-  int32 pessoa_id = 1;
+  int32 id_pessoa = 1;
   Vinculo vinculo = 2;
 }
 
