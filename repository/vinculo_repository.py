@@ -8,7 +8,7 @@ from infra.db import SessionLocal
 
 class VinculoRepository:
 
-    def salvar(vinculo: Vinculo):
+    def salvar(self, vinculo: Vinculo):
         """
         Cria ou atualiza um vínculo no banco de dados.
 
@@ -76,9 +76,11 @@ class VinculoRepository:
     def buscar_por_id(self, vinculo_id: int):
         try:
             with SessionLocal() as session:
-                model = session.execute(
-                    select(models.VinculoModel).where(models.VinculoModel.id == vinculo_id)
-                ).scalar_one_or_none()
+                # Carrega o vínculo com o relacionamento 'curso' já carregado
+                model = session.query(models.VinculoModel)\
+                    .options(joinedload(models.VinculoModel.curso))\
+                    .filter(models.VinculoModel.id == vinculo_id)\
+                    .one_or_none()
 
                 if model is None:
                     return None
@@ -88,7 +90,7 @@ class VinculoRepository:
                     matricula=model.matricula,
                     tipo=TipoVinculo(model.tipo),
                     id_pessoa=model.id_pessoa,
-                    curso_id=model.curso_id
+                    curso_id=model.curso_id  # Usamos curso_id em vez de curso
                 )
         except Exception as e:
             raise e
@@ -121,7 +123,7 @@ class VinculoRepository:
                         matricula=vinculo.matricula,
                         tipo=vinculo.tipo.value,
                         id_pessoa=vinculo.id_pessoa,
-                        curso_id=vinculo.curso.id
+                        curso_id=vinculo.curso_id
                     )
                 )
                 session.commit()
