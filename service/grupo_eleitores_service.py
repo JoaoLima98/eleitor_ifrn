@@ -6,10 +6,19 @@ class GrupoEleitoresService:
     def __init__(self):
         self.grupo_repository = GrupoEleitoresRepository()
 
-    def salvar(self, grupo: GrupoEleitores) -> GrupoEleitores:
-        if self.grupo_repository.buscar_por_nome(grupo.nome):
-            raise ValueError("Já existe um grupo com esse nome.")
-        return self.grupo_repository.salvar(grupo)
+    def salvar(self, grupo: GrupoEleitores):
+        print(f"Salvando grupo no serviço: ID={grupo.id}, Nome={grupo.nome}")
+        
+        try:
+            # Chama o repositório para salvar
+            salvo = self.grupo_repository.salvar(grupo)
+            print(f"Grupo salvo no repositório: ID={salvo.id}, Nome={salvo.nome}")
+            
+            # Retorna o objeto atualizado
+            return salvo
+        except Exception as e:
+            print(f"Erro ao salvar grupo no serviço: {str(e)}")
+            raise e
 
     def buscar_por_id(self, grupo_id: int) -> GrupoEleitores | None:
         return self.grupo_repository.buscar_por_id(grupo_id)

@@ -353,13 +353,13 @@ class SistemaVotacaoClient:
                     vinculos=[]
                 )
             )
-            atualizar_response = self.stub.AtualizarEleitor(atualizar_request)
-            print(f"Eleitor atualizado: Sucesso={atualizar_response.sucesso}")
+            # atualizar_response = self.stub.AtualizarEleitor(atualizar_request)
+            # print(f"Eleitor atualizado: Sucesso={atualizar_response.sucesso}")
             
-            # Remover eleitor
-            remover_request = sysEleitores.RemoverEleitorRequest(eleitor_id=eleitor_id)
-            remover_response = self.stub.RemoverEleitor(remover_request)
-            print(f"Eleitor removido: Sucesso={remover_response.sucesso}")
+            # # Remover eleitor
+            # remover_request = sysEleitores.RemoverEleitorRequest(eleitor_id=eleitor_id)
+            # remover_response = self.stub.RemoverEleitor(remover_request)
+            # print(f"Eleitor removido: Sucesso={remover_response.sucesso}")
             
             self.imprimir_rodape()
             return eleitor_id
@@ -394,7 +394,7 @@ class SistemaVotacaoClient:
             grupo_response = self.stub.SalvarGrupo(grupo_request)
             print(f"Grupo salvo: ID={grupo_response.grupo.id}, Nome={grupo_response.grupo.nome}")
             grupo_id = grupo_response.grupo.id
-            
+            print(grupo_id, "ASUIFHUAHSFHAFUHASUFH")
             # Buscar grupo por ID
             buscar_id_request = sysEleitores.BuscarGrupoPorIdRequest(grupo_id=grupo_id)
             buscar_id_response = self.stub.BuscarGrupoPorId(buscar_id_request)

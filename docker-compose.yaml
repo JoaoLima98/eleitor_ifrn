@@ -11,7 +11,7 @@ services:
     depends_on:
       - postgres
     command: >
-      python gr/servidor_grupo_eleitores.py --host 0.0.0.0 --port 8000
+      python gr/servidor.py --host 0.0.0.0 --port 8000
     environment:
       - PYTHONUNBUFFERED=1    # Evita buffering do stdout
       - PYTHONPATH=/eleitor   # Garante que o Python encontre o módulo 'domain'

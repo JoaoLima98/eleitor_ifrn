@@ -395,11 +395,26 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
     # --- GrupoEleitores ---
     def SalvarGrupo(self, request, context):
         try:
+            print(f"Recebido grupo para salvar: ID={request.grupo.id}, Nome={request.grupo.nome}")
+            
             domain = self.converter_grupo_pb_to_domain(request.grupo)
+            print(f"Grupo convertido para domínio: ID={domain.id}, Nome={domain.nome}")
+            
             salvo = self.grupo_eleitores_service.salvar(domain)
-            return sysele_pb2.SalvarGrupoResponse(grupo=self.converter_grupo_domain_to_pb(salvo))
+            print(f"Grupo salvo no serviço: ID={salvo.id}, Nome={salvo.nome}")
+            
+            grupo_pb = self.converter_grupo_domain_to_pb(salvo)
+            print(f"Grupo convertido para protobuf: ID={grupo_pb.id}, Nome={grupo_pb.nome}")
+            
+            return sysele_pb2.SalvarGrupoResponse(grupo=grupo_pb)
         except ValueError as e:
+            print(f"Erro de valor: {str(e)}")
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
+            context.set_details(str(e))
+            return sysele_pb2.SalvarGrupoResponse()
+        except Exception as e:
+            print(f"Erro interno: {str(e)}")
+            context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(str(e))
             return sysele_pb2.SalvarGrupoResponse()
 
