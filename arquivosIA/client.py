@@ -291,7 +291,7 @@ class SistemaVotacaoClient:
                 vinculo_id=vinculo_id,
                 vinculo=sysEleitores.Vinculo(
                     matricula="2023000",
-                    tipo=0,
+                    tipo=sysEleitores.TipoVinculo.DOCENTE,  # Exemplo de tipo atualizado
                     curso_id=curso.id,
                     id_pessoa=id_pessoa
                 )

@@ -114,37 +114,43 @@ class VinculoRepository:
         except Exception as e:
                 raise e
     def atualizar(self, vinculo: Vinculo, vinculo_id: int):
+        """
+        Atualiza um vínculo existente no banco de dados.
+        
+        Args:
+            vinculo (Vinculo): Objeto Vinculo contendo os dados atualizados.
+            vinculo_id (int): ID do vínculo a ser atualizado.
+            
+        Returns:
+            models.VinculoModel: O objeto VinculoModel atualizado.
+            
+        Raises:
+            Exception: Se o vínculo não for encontrado.
+        """
+        db = SessionLocal()
         try:
-            with SessionLocal() as session:
-                session.execute(
-                    update(models.VinculoModel)
-                    .where(models.VinculoModel.id == vinculo_id)
-                    .values(
-                        matricula=vinculo.matricula,
-                        tipo=vinculo.tipo.value,
-                        id_pessoa=vinculo.id_pessoa,
-                        curso_id=vinculo.curso_id
-                    )
-                )
-                session.commit()
-
-                model = session.query(models.VinculoModel)\
-                    .options(joinedload(models.VinculoModel.curso))\
-                    .filter_by(id=vinculo_id).one_or_none()
-
-                if model is None:
-                    raise Exception(f"Vínculo com id {vinculo_id} não encontrado para atualização.")
-
-                return Vinculo(
-                    id=model.id,
-                    matricula=model.matricula,
-                    tipo=TipoVinculo(model.tipo),
-                    id_pessoa=model.id_pessoa,
-                    curso_id=model.curso_id
-                )
-
+            # Busca o vínculo pelo ID
+            db_vinculo = db.query(models.VinculoModel).filter(models.VinculoModel.id == vinculo_id).first()
+            
+            if not db_vinculo:
+                raise Exception(f"Vínculo com ID {vinculo_id} não encontrado")
+            
+            # Atualiza os campos do vínculo existente
+            db_vinculo.matricula = vinculo.matricula
+            db_vinculo.tipo = vinculo.tipo.value  # Use .value para enums
+            db_vinculo.id_pessoa = vinculo.id_pessoa
+            db_vinculo.curso_id = vinculo.curso_id
+            
+            db.commit()
+            db.refresh(db_vinculo)
+            
+            return db_vinculo
+            
         except Exception as e:
+            db.rollback()
             raise e
+        finally:
+            db.close()
 
 
         
