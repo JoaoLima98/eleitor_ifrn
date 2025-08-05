@@ -50,7 +50,8 @@ message Eleitor {
   string email = 3;
   string cpf = 4;
   string data_nascimento = 5;
-  StatusEnum status = 6;
+  StatusEnum status = 7;
+  repeated Vinculo vinculos = 6;
 }
 
 message GrupoEleitores {

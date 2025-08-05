@@ -6,7 +6,7 @@ from domain.vinculo import Vinculo
 
 class Eleitor(Pessoa):
     
-    def __init__(self, id: int, nome: str, email: str, cpf: str, data_nascimento: str, status: int, vinculos: list[Vinculo]):
+    def __init__(self, id: int, nome: str, email: str, cpf: str, data_nascimento: str, status: int, vinculos = list[Vinculo] or None):
         super().__init__(
             id=id,
             cpf=cpf,

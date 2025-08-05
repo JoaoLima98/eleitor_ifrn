@@ -129,13 +129,13 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
             Status.INATIVO: sysele_pb2.StatusEnum.INATIVO,
             Status.SUSPENSO: sysele_pb2.StatusEnum.SUSPENSO
         }.get(eleitor.status, sysele_pb2.StatusEnum.ATIVO)
-        data = eleitor.data_nascimento.strftime("%Y-%m-%d") if eleitor.data_nascimento else ""
+        
         return sysele_pb2.Eleitor(
             id=eleitor.id,
             nome=eleitor.nome,
             email=eleitor.email,
             cpf=eleitor.cpf,
-            data_nascimento=data,
+            data_nascimento=eleitor.data_nascimento,
             status=status
         )
 
@@ -145,14 +145,20 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
             sysele_pb2.StatusEnum.INATIVO: Status.INATIVO,
             sysele_pb2.StatusEnum.SUSPENSO: Status.SUSPENSO
         }.get(eleitor_pb.status, Status.ATIVO)
-
+        
+        # Converta os vínculos do protobuf para objetos de domínio
+        vinculos = []
+        for vinculo_pb in eleitor_pb.vinculos:
+            vinculos.append(self.converter_vinculo_pb_to_domain(vinculo_pb))
+        
         return Eleitor(
             id=eleitor_pb.id,
             nome=eleitor_pb.nome,
             email=eleitor_pb.email,
             cpf=eleitor_pb.cpf,
             data_nascimento=eleitor_pb.data_nascimento,
-            status=status
+            status=status,
+            vinculos=vinculos  # Adicione os vínculos convertidos
         )
 
     def converter_grupo_domain_to_pb(self, grupo: GrupoEleitores):

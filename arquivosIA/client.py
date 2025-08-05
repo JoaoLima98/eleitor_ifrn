@@ -329,11 +329,12 @@ class SistemaVotacaoClient:
             eleitor_request = sysEleitores.SalvarEleitorRequest(
                 eleitor=sysEleitores.Eleitor(
                     id=id_pessoa,  # ID da pessoa
-                    nome="João Silva",
-                    email="joao.silva@example.com",
                     cpf="61578630053",
+                    email="joao.silva@example.com",
+                    nome="João Silva",
                     data_nascimento="1990-05-15",
-                    status=sysEleitores.StatusEnum.ATIVO
+                    status=sysEleitores.StatusEnum.ATIVO,
+                    vinculos=[],  # Lista de vínculos vazia
                 )
             )
             eleitor_response = self.stub.SalvarEleitor(eleitor_request)
@@ -344,7 +345,12 @@ class SistemaVotacaoClient:
             atualizar_request = sysEleitores.AtualizarEleitorRequest(
                 eleitor_id=eleitor_id,
                 eleitor=sysEleitores.Eleitor(
-                    status=sysEleitores.StatusEnum.INATIVO
+                    cpf="61578630053",
+                    email="joao.silva.atualizado@example.com",
+                    data_nascimento="1990-05-15",
+                    nome="João Silva",
+                    status=sysEleitores.StatusEnum.INATIVO,
+                    vinculos=[]
                 )
             )
             atualizar_response = self.stub.AtualizarEleitor(atualizar_request)
