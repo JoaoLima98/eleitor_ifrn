@@ -265,22 +265,19 @@ class SistemaVotacaoClient:
             int: ID do vínculo criado
         """
         self.imprimir_cabecalho("Testando Serviço de Vínculo")
-        print(curso, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
         try:
             # Salvar um novo vínculo
             vinculo_request = sysEleitores.SalvarVinculoRequest(
                 vinculo=sysEleitores.Vinculo(
                     id=0,  # ID será gerado pelo banco
                     matricula="2023001",
-                    tipo=1,
+                    tipo=1,  # Exemplo de tipo
                     id_pessoa=id_pessoa,
                     curso_id=curso.id
                 )
             )
-            print(vinculo_request, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII deu erro")
-            print(vinculo_request, "AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
             vinculo_response = self.stub.SalvarVinculo(vinculo_request)
-            print("CHEGOU AQUIQWURQIWRIQWUAQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+            print(vinculo_response, "CHEGOU AQUIQWURQIWRIQWUAQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
             print(f"Vínculo salvo: ID={vinculo_response.vinculo.id}, Matrícula={vinculo_response.vinculo.matricula}")
             vinculo_id = vinculo_response.vinculo.id
             
