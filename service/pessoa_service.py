@@ -26,9 +26,14 @@ class PessoaService:
             raise ValueError("CPF inválido.")
         return self.pessoa_repository.buscar_por_cpf(cpf)
     
+    def buscar_por_id(self, id: int):
+        if not id:
+            raise ValueError("Pessoa inválido.")
+        return self.pessoa_repository.buscar_por_id(id)
+    
     def buscar_por_email(self, email: str):
         if not email:
-            raise ValueError("Email inválido.")
+            raise ValueError("Email não encontrado inválido.")
         return self.pessoa_repository.buscar_por_email(email)
     
     def atualizar(self, pessoa, id_pessoa):

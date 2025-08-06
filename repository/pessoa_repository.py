@@ -19,7 +19,6 @@ class PessoaRepository:
         ]
 
         model = models.PessoaModel(
-            id=pessoa.id,
             nome=pessoa.nome,
             cpf=pessoa.cpf,
             email=pessoa.email,

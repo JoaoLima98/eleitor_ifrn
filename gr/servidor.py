@@ -162,7 +162,9 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
         )
 
     def converter_grupo_domain_to_pb(self, grupo: GrupoEleitores):
+        print('\n\n*************** converter_grupo_domain_to_pb', hasattr(grupo, 'lista_eleitores'), '\n\n\n')
         eleitores_pb = [self.converter_eleitor_domain_to_pb(e) for e in (grupo.lista_eleitores or [])]
+        
         return sysele_pb2.GrupoEleitores(
             id=grupo.id,
             nome=grupo.nome,
@@ -270,6 +272,7 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
 
     # --- Pessoa ---
     def SalvarPessoa(self, request, context):
+        print('*************************',request)
         try:
             domain = self.converter_pessoa_pb_to_domain(request.pessoa)
             salvo = self.pessoa_service.salvar(domain)
@@ -419,6 +422,7 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
             return sysele_pb2.SalvarGrupoResponse()
 
     def BuscarGrupoPorId(self, request, context):
+        print('************------------------', request)
         grupo = self.grupo_eleitores_service.buscar_por_id(request.grupo_id)
         if not grupo:
             context.set_code(grpc.StatusCode.NOT_FOUND)
@@ -436,9 +440,9 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
 
     def AdicionarEleitor(self, request, context):
         try:
-            eleitor = Eleitor(id=request.eleitor_id)
+            eleitor = self.eleitor_service.buscar_por_id(request.eleitor_id)  
             grupo = self.grupo_eleitores_service.adicionar_eleitor(request.grupo_id, eleitor)
-            return sysele_pb2.AdicionarEleitorResponse(grupo=self.converter_grupo_domain_to_pb(grupo))
+            return sysele_pb2.AdicionarEleitorResponse(grupo_id=grupo.id)
         except ValueError as e:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             context.set_details(str(e))
@@ -446,9 +450,9 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
 
     def RemoverEleitorDoGrupo(self, request, context):
         try:
-            eleitor = Eleitor(id=request.eleitor_id)
+            eleitor = self.eleitor_service.buscar_por_id(request.eleitor_id)
             grupo = self.grupo_eleitores_service.remover_eleitor(request.grupo_id, eleitor)
-            return sysele_pb2.RemoverEleitorDoGrupoResponse(grupo=self.converter_grupo_domain_to_pb(grupo))
+            return sysele_pb2.RemoverEleitorDoGrupoResponse(grupo_id=grupo.id)
         except ValueError as e:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
             context.set_details(str(e))
@@ -457,6 +461,7 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
     def AtivaInativaGrupo(self, request, context):
         try:
             ativo = self.grupo_eleitores_service.ativa_inativa_grupo(request.grupo_id)
+            print('\n\n\n\n\n*********************** GROUPO ID', ativo)
             return sysele_pb2.AtivaInativaGrupoResponse(ativo=ativo)
         except ValueError as e:
             context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
@@ -466,6 +471,7 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
     def ListarEleitoresPorGrupo(self, request, context):
         try:
             eleitores = self.grupo_eleitores_service.listar_eleitores_por_grupo_id(request.grupo_id)
+            
             eleitores_pb = [self.converter_eleitor_domain_to_pb(e) for e in eleitores]
             return sysele_pb2.ListarEleitoresPorGrupoResponse(eleitores=eleitores_pb)
         except ValueError as e:
@@ -481,6 +487,7 @@ class SistemaVotacaoServicer(sysele_pb2_grpc.SistemaVotacaoServiceServicer):
     def AtualizarGrupo(self, request, context):
         try:
             domain = self.converter_grupo_pb_to_domain(request.grupo)
+            print('*********************AtualizarGrupo-lOG01', domain.__dict__)
             self.grupo_eleitores_service.atualizar(domain, request.grupo_id)
             return sysele_pb2.AtualizarGrupoResponse(sucesso=True)
         except Exception as e:

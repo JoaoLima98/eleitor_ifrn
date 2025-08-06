@@ -31,3 +31,8 @@ class EleitorService:
         return self.eleitor_repository.atualizar(eleitor, eleitor_id)
     def remover(self, eleitor_id: int):
         return self.eleitor_repository.remover(eleitor_id)
+    
+    def buscar_por_id(self, id: int):
+        if not id:
+            raise ValueError("Eleitor inválido.")
+        return self.eleitor_repository.buscar_por_id(id)

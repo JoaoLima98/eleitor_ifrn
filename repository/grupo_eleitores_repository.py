@@ -1,10 +1,9 @@
-from sqlalchemy import select, update
+from sqlalchemy import select, update, text
 from sqlalchemy.orm import selectinload
 from models import models
 from domain.grupo_eleitores import GrupoEleitores
 from domain.enum.status import Status
 from domain.eleitor import Eleitor
-from gr.grupo_eleitores_pb2 import GrupoEleitoresMessage, EleitorMessage
 from infra.db import SessionLocal
 
 class GrupoEleitoresRepository:
@@ -59,8 +58,7 @@ class GrupoEleitoresRepository:
                     )
                     .where(models.GrupoEleitoresModel.id == grupo_id)
                 )
-                result = db.execute(stmt).scalar_one_or_none()
-                
+                result = db.execute(stmt).scalar_one_or_none()      
                 if result is None:
                     return None
                     
@@ -71,11 +69,11 @@ class GrupoEleitoresRepository:
                     pessoa = eleitor_model.pessoa
                     eleitor = Eleitor(
                         id=eleitor_model.id,
-                        nome=pessoa.nome,
+                        nome=pessoa.nome, 
                         email=pessoa.email,
                         cpf=pessoa.cpf,
-                        data_nascimento=pessoa.data_nascimento.strftime("%Y-%m-%d") if pessoa.data_nascimento else "",
-                        status=Status(eleitor_model.status),
+                        data_nascimento=pessoa.data_nascimento,
+                        status=Status[eleitor_model.status.name],
                         vinculos=[]
                     )
                     lista_eleitores.append(eleitor)
@@ -212,15 +210,20 @@ class GrupoEleitoresRepository:
     def atualizar(self, grupo: GrupoEleitores, grupo_id: int):
         try:
             with SessionLocal() as session:
-                result = session.execute(
+                stmt = (
                     update(models.GrupoEleitoresModel)
                     .where(models.GrupoEleitoresModel.id == grupo_id)
-                    .values(nome=grupo.nome,
-                descricao=grupo.descricao,
-                ativo=grupo.ativo)
+                    .values(
+                        nome=grupo.nome,
+                        descricao=grupo.descricao,
+                        ativo=grupo.ativo
+                    )
+                    .returning(models.GrupoEleitoresModel)  
                 )
+
+                result = session.execute(stmt)
                 session.commit()
-                return result
+                return result.scalar_one_or_none()
         except Exception as e:
             raise e
         
@@ -233,29 +236,28 @@ class GrupoEleitoresRepository:
             raise e
     
     def listar_eleitores_por_grupo_id(self, grupo_id: int) -> list[Eleitor]:
-        with SessionLocal() as db:
-            stmt = (
-                select(models.GrupoEleitoresModel)
-                .options(selectinload(models.GrupoEleitoresModel.eleitores))
-                .where(models.GrupoEleitoresModel.id == grupo_id)
-            )
-            result = db.execute(stmt).scalar_one_or_none()
-
-            if result is None:
-                return []
-
-            eleitores = []
-
-            for eleitor_model in result.eleitores:
-                eleitor = Eleitor(
-                    id=eleitor_model.id,
-                    nome=eleitor_model.nome,
-                    email=eleitor_model.email,
-                    cpf=eleitor_model.cpf,
-                    data_nascimento=eleitor_model.data_nascimento,
-                    status=eleitor_model.status,
-                    vinculos=[]  # ou carregue os vínculos aqui se necessário
-                )
-                eleitores.append(eleitor)
-
-            return eleitores
+        try:
+            with SessionLocal() as session:                
+                grupo_model = session.query(models.GrupoEleitoresModel).filter(models.GrupoEleitoresModel.id == grupo_id).first()
+                if not grupo_model:
+                    raise ValueError(f"Grupo com ID {grupo_id} não encontrado")
+                
+                # Converte os eleitores do modelo para objetos de domínio
+                lista_eleitores = []
+                for eleitor_model in grupo_model.eleitores:
+                    # Acessa os dados da pessoa através do relacionamento                 
+                    pessoa = eleitor_model.pessoa
+                    eleitor = Eleitor(
+                        id=eleitor_model.id,
+                        nome=pessoa.nome,  # Agora podemos acessar o nome através da pessoa
+                        email=pessoa.email,
+                        cpf=pessoa.cpf,
+                        data_nascimento=pessoa.data_nascimento,
+                        status=Status[eleitor_model.status.name],
+                        vinculos=[]
+                    )
+                    lista_eleitores.append(eleitor)                
+                return lista_eleitores
+        except Exception as e:
+            print('Erro gerado', e)
+            raise e

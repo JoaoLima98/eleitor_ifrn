@@ -5,8 +5,7 @@ from datetime import datetime
 
 class GrupoEleitores:
     
-    def __init__(self, id: int,  nome: str, descricao: str, ativo: bool = True, 
-                 lista_eleitores: List[Eleitor] = None):
+    def __init__(self, id: int,  nome: str, descricao: str, ativo: bool = True, lista_eleitores: List[Eleitor] = []):
         self.id = id
         self.nome = nome
         self.descricao = descricao

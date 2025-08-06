@@ -266,6 +266,22 @@ message SalvarGrupoResponse {
   GrupoEleitores grupo = 1;
 }
 
+message BuscarPessoaPorIdRequest {
+  int32 pessoa_id = 1;
+}
+
+message BuscarPessoaPorIdResponse {
+  Pessoa pessoa = 1;
+}
+
+message BuscarEleitorPorIdRequest {
+  int32 eleitor_id = 1;
+}
+
+message BuscarEleitorPorIdResponse {
+  Eleitor eleitor = 1;
+}
+
 message BuscarGrupoPorIdRequest {
   int32 grupo_id = 1;
 }
@@ -288,7 +304,7 @@ message AdicionarEleitorRequest {
 }
 
 message AdicionarEleitorResponse {
-  GrupoEleitores grupo = 1;
+  int32 grupo_id = 1;
 }
 
 message RemoverEleitorDoGrupoRequest {
@@ -297,7 +313,7 @@ message RemoverEleitorDoGrupoRequest {
 }
 
 message RemoverEleitorDoGrupoResponse {
-  GrupoEleitores grupo = 1;
+  int32 grupo_id = 1;
 }
 
 message AtivaInativaGrupoRequest {

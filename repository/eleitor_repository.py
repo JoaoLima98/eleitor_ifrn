@@ -50,6 +50,16 @@ class EleitorRepository:
         except Exception as e:
             raise e
         
+    def buscar_por_id(self, id: int):
+        try:
+            with SessionLocal() as session:
+                model = session.get(models.EleitorModel, id)
+                if model is None:
+                    return None
+                return model
+        except Exception as e:
+            raise e
+        
     def remover(self, eleitor_id: int):
         try:
             with SessionLocal() as session:

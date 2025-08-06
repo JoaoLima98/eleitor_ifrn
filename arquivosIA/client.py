@@ -409,38 +409,39 @@ class SistemaVotacaoClient:
             adicionar_request = sysEleitores.AdicionarEleitorRequest(
                 grupo_id=grupo_id,
                 eleitor_id=eleitor_id
-            )
+            )            
             adicionar_response = self.stub.AdicionarEleitor(adicionar_request)
-            print(f"Eleitor adicionado ao grupo: Grupo ID={adicionar_response.grupo.id}, Eleitores={len(adicionar_response.grupo.eleitores)}")
-            
-            # Listar eleitores do grupo
-            listar_request = sysEleitores.ListarEleitoresPorGrupoRequest(grupo_id=grupo_id)
+            print(f"Eleitor adicionado ao grupo: Grupo ID={adicionar_response}")
+   
+            # Listar eleitores do grupo            
+            listar_request = sysEleitores.ListarEleitoresPorGrupoRequest(grupo_id=grupo_id)            
             listar_response = self.stub.ListarEleitoresPorGrupo(listar_request)
             print(f"Eleitores no grupo: {len(listar_response.eleitores)}")
             for eleitor in listar_response.eleitores:
                 print(f"  - ID: {eleitor.id}, Nome: {eleitor.nome}, Status: {eleitor.status}")
             
+           
             # Ativar/Inativar grupo
             ativa_inativa_request = sysEleitores.AtivaInativaGrupoRequest(grupo_id=grupo_id)
             ativa_inativa_response = self.stub.AtivaInativaGrupo(ativa_inativa_request)
-            print(f"Status do grupo alterado: Ativo={ativa_inativa_response.ativo}")
+            print(f"Status do grupo alterado: Grupo ID={grupo_id}, Ativo={ativa_inativa_response.ativo}")
             
             # Remover eleitor do grupo
+            
             remover_eleitor_request = sysEleitores.RemoverEleitorDoGrupoRequest(
                 grupo_id=grupo_id,
                 eleitor_id=eleitor_id
             )
             remover_eleitor_response = self.stub.RemoverEleitorDoGrupo(remover_eleitor_request)
-            print(f"Eleitor removido do grupo: Grupo ID={remover_eleitor_response.grupo.id}, Eleitores={len(remover_eleitor_response.grupo.eleitores)}")
-            
-            # Listar todos os grupos
+            print(f"Eleitor removido do grupo: Grupo ID={remover_eleitor_response}")
+
             listar_todos_request = sysEleitores.ListarTodosGruposRequest()
             listar_todos_response = self.stub.ListarTodosGrupos(listar_todos_request)
             print(f"Total de grupos: {len(listar_todos_response.grupos)}")
             for grupo in listar_todos_response.grupos:
                 print(f"  - ID: {grupo.id}, Nome: {grupo.nome}, Ativo: {grupo.ativo}")
             
-            # Atualizar grupo
+            # Atualizar grupo            
             atualizar_request = sysEleitores.AtualizarGrupoRequest(
                 grupo_id=grupo_id,
                 grupo=sysEleitores.GrupoEleitores(
