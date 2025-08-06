@@ -199,7 +199,7 @@ class SistemaVotacaoClient:
         self.imprimir_cabecalho("Testando Serviço de Pessoa")
         
         try:
-            # Salvar uma nova pessoa
+            # Salvar 1uma nova pessoa
             pessoa_request = sysEleitores.SalvarPessoaRequest(
                 pessoa=sysEleitores.Pessoa(
                     id=1,  # ID será gerado pelo banco
