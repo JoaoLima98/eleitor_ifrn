@@ -20,6 +20,7 @@ alembic upgrade head
 
 # Gere os arquivos gRPC a partir do proto
 python -m grpc_tools.protoc -I./protos --python_out=./gr --grpc_python_out=./gr ./protos/sysele.proto
+Importante lembrar de entrar no sysele_pb2_grpc e mudar o import de: import sysele_pb2 as sysele__pb2 para: from gr import sysele_pb2 as sysele__pb2
 
 # Rode o servidor
 python gr/servidor.py --host 0.0.0.0 --port 8000
