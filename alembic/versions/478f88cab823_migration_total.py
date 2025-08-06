@@ -1,8 +1,8 @@
-"""criar tables
+"""Migration_total
 
-Revision ID: 309e16c81940
-Revises: ebf048f3960d
-Create Date: 2025-07-30 16:39:33.387449
+Revision ID: 478f88cab823
+Revises: 
+Create Date: 2025-08-06 17:06:32.288360
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '309e16c81940'
-down_revision: Union[str, Sequence[str], None] = 'ebf048f3960d'
+revision: str = '478f88cab823'
+down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -48,7 +48,7 @@ def upgrade() -> None:
     sa.Column('nome', sa.String(), nullable=False),
     sa.Column('cpf', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
-    sa.Column('data_nascimento', sa.Date(), nullable=False),
+    sa.Column('data_nascimento', sa.String(), nullable=False),
     sa.Column('data_criacao', sa.DateTime(), nullable=True),
     sa.Column('data_atualizacao', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
@@ -84,14 +84,16 @@ def upgrade() -> None:
     )
     op.create_table('vinculos',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('tipo', sa.String(), nullable=False),
-    sa.Column('id_pessoa', sa.Integer(), nullable=False),
-    sa.Column('curso_id', sa.Integer(), nullable=False),
+    sa.Column('matricula', sa.String(), nullable=False),
+    sa.Column('tipo', sa.Enum('DISCENTE', 'DOCENTE', name='tipovinculo'), nullable=False),
+    sa.Column('id_pessoa', sa.Integer(), nullable=True),
+    sa.Column('curso_id', sa.Integer(), nullable=True),
     sa.Column('data_criacao', sa.DateTime(), nullable=True),
     sa.Column('data_atualizacao', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['curso_id'], ['cursos.id'], ),
+    sa.ForeignKeyConstraint(['curso_id'], ['cursos.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['id_pessoa'], ['pessoas.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('matricula')
     )
     op.create_index(op.f('ix_vinculos_id'), 'vinculos', ['id'], unique=False)
     # ### end Alembic commands ###
